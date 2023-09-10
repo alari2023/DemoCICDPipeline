@@ -52,5 +52,5 @@ jobs:
               run: sfdx auth:sfdxurl:store -f ./SFDX_AUTH_URL_DEMOST.txt -s -a integration
 
             - name: 'Deploy the entire branch to Test Org org'
-              run: sfdx force:source:deploy -p force-app --testlevel RunLocalTests --json
+              run: sfdx force:source:deploy -p "changed-sources/force-app" force-app --testlevel RunLocalTests --json
 
