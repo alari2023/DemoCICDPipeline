@@ -59,13 +59,13 @@ jobs:
             - name: 'Installing SFDX scanner'
               run: sfdx plugins:install @salesforce/sfdx-scanner
 
-            - name: 'Populate auth file with SFDX_URL secret of integration org'
+            - name: 'Populate auth file with SFDX_URL secret of test org'
               shell: bash
               run: |
                   echo ${{ secrets.SFDX_AUTH_URL_DEMOST}} > ./SFDX_AUTH_URL_DEMOST.txt
 
             # Authenticate to org using the URL stored in the text file
-            - name: 'Authenticate to Integration Org'
+            - name: 'Authenticate to  Test Org'
               run: sfdx auth:sfdxurl:store -f ./SFDX_AUTH_URL_DEMOST.txt -s -a integration
 
             # We use SFDX Git Delta to create a directory with only the metadata that has changed.
