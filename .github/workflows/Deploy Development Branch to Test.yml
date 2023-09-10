@@ -4,7 +4,7 @@ name: Deploy Development branch to Test Org
 # Definition when the workflow should run
 on:
     push:
-      branches: [ integration ]
+      branches: [ development ]
       paths:
         - 'force-app/**'
             
