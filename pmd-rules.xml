@@ -57,7 +57,6 @@
 
 	<rule ref="rulesets/apex/complexity.xml/AvoidDeeplyNestedIfStmts" message="Deeply nested if..else statements are hard to read">
 		<priority>3</priority>
-		<properties>
 	</rule>
 
 
