@@ -60,7 +60,7 @@
 		<priority>1</priority>
 	</rule>
 
-	<rule ref="category/apex/performance.xml/AvoidDmlStatementsInLoops" message="Avoid Soql queries inside loops">
+	<rule ref="category/apex/performance.xml/OperationWithLimitsInLoop " message="Avoid Soql queries inside loops">
 		<priority>1</priority>
 	</rule>
 
@@ -76,8 +76,7 @@
 		<priority>3</priority>
 	</rule>
 
-	<rule ref="category/apex/codestyle.xml/MethodNamingConventions"
-		  message="Method name does not begin with a lower case character.">
+	<rule ref="category/apex/codestyle.xml/MethodNamingConventions" message="Method name does not begin with a lower case character.">
 		<priority>3</priority>
 	</rule>
 
