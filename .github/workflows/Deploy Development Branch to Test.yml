@@ -1,10 +1,10 @@
 # Unique name for this workflow
-name: Deploy Development branch to Test Org
+name: Deploy branch to org
 
 # Definition when the workflow should run
 on:
     push:
-      branches: [ development ]
+      branches: [feature/** , develop, release/** ,master ]
       paths:
         - 'force-app/**'
             
@@ -36,11 +36,26 @@ jobs:
               with:
                 fetch-depth: 0
 
-            # Store secret for both otgs
-            - name: 'Populate auth file with SFDX_URL secret of the test org'
+            ##Populate auth file with SFDX_URL secret of deployment destination.
+            - name: 'Populate auth file with SFDX_URL secret of ST deployment destination'
               shell: bash
+              if: ${{ github.event.pull_request.base.ref == 'develop' }}
               run: |
-                  echo ${{ secrets.SFDX_AUTH_URL_DEMOST}} > ./SFDX_AUTH_URL_DEMOST.txt
+                  echo ${{ secrets.SFDX_AUTH_URL_DEMOST}} > ./SFDX_AUTH_URL.txt
+            
+            ##Populate auth file with SFDX_URL secret of release destination.
+            - name: 'Populate auth file with SFDX_URL secret of release deployment destination'
+              shell: bash            
+              if: ${{ github.event.pull_request.base.ref == 'release/**' }}
+              run: |
+                  echo ${{ secrets.SFDX_AUTH_URL_RELEASE}} > ./SFDX_AUTH_URL.txt
+            
+            ##Populate auth file with SFDX_URL secret of prod destination.
+            - name: 'Populate auth file with SFDX_URL secret of production deployment destination'
+              shell: bash
+              if: ${{ github.event.pull_request.base.ref == 'master' }}
+              run: |
+                  echo ${{ secrets.SFDX_AUTH_URL_PROD}} > ./SFDX_AUTH_URL.txt
                   
             - name: 'Create delta packages for new, modified or deleted metadata'
               run: | 
@@ -48,9 +63,13 @@ jobs:
                   sfdx sgd:source:delta --to "HEAD" --from "HEAD^" --output changed-sources/ --generate-delta --source force-app/
 
             # Authenticate to org
-            - name: 'Authenticate to Test Org'
-              run: sfdx auth:sfdxurl:store -f ./SFDX_AUTH_URL_DEMOST.txt -s -a integration
+            - name: 'Authenticate to deployment org'
+              run: sfdx auth:sfdxurl:store -f ./SFDX_AUTH_URL.txt -s -a deployment
 
             - name: 'Deploy the entire branch to Test Org org'
               run: sfdx force:source:deploy -p "changed-sources/force-app"  --testlevel RunLocalTests --json
+              
+            - name: 'Deploy destructive changes (if any)'
+              run: |
+                  sfdx force:mdapi:deploy -d "changed-sources/destructiveChanges" --ignorewarnings
 
