@@ -89,8 +89,4 @@
 		<priority>3</priority>
 	</rule>
 
-	<rule ref="rulesets/apex/style.xml/VariableNamingConventions" message="{0} variable {1} should begin with {2}">
-		<priority>3</priority>
-	</rule>
-
 </ruleset>
