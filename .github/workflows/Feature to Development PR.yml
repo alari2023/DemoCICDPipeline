@@ -52,16 +52,22 @@ jobs:
 
 
             ##Populate auth file with SFDX_URL secret of deployment destination.
-            - name: 'Populate auth file with SFDX_URL secret of deployment destination'
+            - name: 'Populate auth file with SFDX_URL secret of ST deployment destination'
               shell: bash
               if: ${{ github.event.pull_request.base.ref == 'develop' }}
               run: |
                   echo ${{ secrets.SFDX_AUTH_URL_DEMOST}} > ./SFDX_AUTH_URL.txt
-                  
+            
+            ##Populate auth file with SFDX_URL secret of release destination.
+            - name: 'Populate auth file with SFDX_URL secret of release deployment destination'
+              shell: bash            
               if: ${{ github.event.pull_request.base.ref == 'release/**' }}
               run: |
                   echo ${{ secrets.SFDX_AUTH_URL_RELEASE}} > ./SFDX_AUTH_URL.txt
-
+            
+            ##Populate auth file with SFDX_URL secret of prod destination.
+            - name: 'Populate auth file with SFDX_URL secret of production deployment destination'
+              shell: bash
               if: ${{ github.event.pull_request.base.ref == 'master' }}
               run: |
                   echo ${{ secrets.SFDX_AUTH_URL_PROD}} > ./SFDX_AUTH_URL.txt
