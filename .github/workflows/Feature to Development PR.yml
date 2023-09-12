@@ -57,7 +57,7 @@ jobs:
 
             - name: 'Populate auth file with SFDX_URL secret of test org'
               shell: bash
-              if: ${{ github.event.pull_request.base.ref = 'develop' }}
+              if: ${{ github.event.pull_request.base.ref == 'develop' }}
               run: |
                   echo ${{ secrets.SFDX_AUTH_URL_DEMOST}} > ./SFDX_AUTH_URL.txt
 
