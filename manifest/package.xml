@@ -17,7 +17,10 @@
 		<name>ApexTrigger</name>
 	</types>
 	<types>
+		<members>Account.Test_Deploy_field__c</members>
 		<members>Account.Test_Update_Field__c</members>
+		<members>Opportunity.OrderNumber__c</members>
+		<members>Opportunity.TrackingNumber__c</members>
 		<name>CustomField</name>
 	</types>
 	<version>55.0</version>
