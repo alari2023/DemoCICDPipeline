@@ -1,5 +1,5 @@
 # Unique name for this workflow
-name: Validate branch changes to deployment org
+name: Validation pipeline
 
 # Definition when the workflow should run
 on:
@@ -86,7 +86,9 @@ jobs:
 
             - name: 'Setup PMD'
               uses: legetz/setup-pmd@7.0.0-rc3
+              
             - name: 'APEX full scan'
+              if: ${{ hashFiles('changed-sources/force-app/main/default/classes/*.cls') != '' }}
               run: pmd check --dir changed-sources/force-app/main/default/classes/*.cls --rulesets ./pmd-rules.xml -f text
 
             - name: 'Check-only deploy delta changes - run all tests'
