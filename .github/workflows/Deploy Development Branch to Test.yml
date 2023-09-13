@@ -37,31 +37,35 @@ jobs:
                 fetch-depth: 0
                 
                 
-            - name: Get current branch
+            - name: Branch used
+              id: extract_branch
               run: |
-                raw=$(git branch -r --contains ${{ github.ref }})
-                branch=${raw##*/}
-                echo "{name}=branch" >> $GITHUB_OUTPUT
-                echo "Branch is $branch."
+                if [[ "${GITHUB_EVENT_NAME}" == "push" ]]; then
+                    echo "::set-output name=branch::$(echo ${GITHUB_REF##*/})"
+                elif [[ "${GITHUB_EVENT_NAME}" == "pull_request" ]]; then
+                    echo "::set-output name=branch::$(echo $GITHUB_BASE_REF)"
+                else
+                    echo "::set-output name=branch::INVALID_EVENT_BRANCH_UNKNOWN"
+                fi
 
             ##Populate auth file with SFDX_URL secret of deployment destination.
             - name: 'Populate auth file with SFDX_URL secret of ST deployment destination'
               shell: bash
-              if: ${{ branch == 'develop' }}
+              if: ${{ steps.extract_branch.outputs.branch == 'develop' }}
               run: |
                   echo ${{ secrets.SFDX_AUTH_URL_DEMOST}} > ./SFDX_AUTH_URL.txt
             
             ##Populate auth file with SFDX_URL secret of release destination.
             - name: 'Populate auth file with SFDX_URL secret of release deployment destination'
               shell: bash            
-              if: ${{ branch == 'release/**' }}
+              if: ${{ steps.extract_branch.outputs.branch == 'release/**' }}
               run: |
                   echo ${{ secrets.SFDX_AUTH_URL_RELEASE}} > ./SFDX_AUTH_URL.txt
             
             ##Populate auth file with SFDX_URL secret of prod destination.
             - name: 'Populate auth file with SFDX_URL secret of production deployment destination'
               shell: bash
-              if: ${{ branch == 'master' }}
+              if: ${{ steps.extract_branch.outputs.branch == 'master' }}
               run: |
                   echo ${{ secrets.SFDX_AUTH_URL_PROD}} > ./SFDX_AUTH_URL.txt
                   
