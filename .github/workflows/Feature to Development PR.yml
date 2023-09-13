@@ -89,7 +89,7 @@ jobs:
               
             - name: 'APEX full scan'
               if: ${{ --dir changed-sources/force-app/main/default/classes/*.cls }}
-              run: pmd check --dir changed-sources/force-app/main/default/classes/*.cls --rulesets ./pmd-rules.xml -f text
+              run: pmd check --dir changed-sources/force-app/main/default/classes/ --rulesets ./pmd-rules.xml -f text
 
             - name: 'Check-only deploy delta changes - run all tests'
               run: |
