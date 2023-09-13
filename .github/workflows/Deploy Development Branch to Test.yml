@@ -1,5 +1,5 @@
 # Unique name for this workflow
-name: Deploy branch to org
+name: Deployment Pipeline
 
 # Definition when the workflow should run
 on:
@@ -35,25 +35,33 @@ jobs:
               uses: actions/checkout@v3
               with:
                 fetch-depth: 0
+                
+                
+            - name: Get current branch
+              run: |
+                raw=$(git branch -r --contains ${{ github.ref }})
+                branch=${raw##*/}
+                echo "{name}=branch" >> $GITHUB_OUTPUT
+                echo "Branch is $branch."
 
             ##Populate auth file with SFDX_URL secret of deployment destination.
             - name: 'Populate auth file with SFDX_URL secret of ST deployment destination'
               shell: bash
-              if: ${{ github.event.pull_request.base.ref == 'develop' }}
+              if: ${{ $branch == 'develop' }}
               run: |
                   echo ${{ secrets.SFDX_AUTH_URL_DEMOST}} > ./SFDX_AUTH_URL.txt
             
             ##Populate auth file with SFDX_URL secret of release destination.
             - name: 'Populate auth file with SFDX_URL secret of release deployment destination'
               shell: bash            
-              if: ${{ github.event.pull_request.base.ref == 'release/**' }}
+              if: ${{ $branch == 'release/**' }}
               run: |
                   echo ${{ secrets.SFDX_AUTH_URL_RELEASE}} > ./SFDX_AUTH_URL.txt
             
             ##Populate auth file with SFDX_URL secret of prod destination.
             - name: 'Populate auth file with SFDX_URL secret of production deployment destination'
               shell: bash
-              if: ${{ github.event.pull_request.base.ref == 'master' }}
+              if: ${{ $branch == 'master' }}
               run: |
                   echo ${{ secrets.SFDX_AUTH_URL_PROD}} > ./SFDX_AUTH_URL.txt
                   
