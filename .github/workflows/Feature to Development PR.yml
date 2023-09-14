@@ -61,7 +61,7 @@ jobs:
             ##Populate auth file with SFDX_URL secret of release destination.
             - name: 'Populate auth file with SFDX_URL secret of release deployment destination'
               shell: bash            
-              if: ${{ github.event.pull_request.base.ref == 'release/release1' }}
+              if: ${{ contains(github.event.pull_request.base.ref == 'release') }}
               run: |
                   echo ${{ secrets.SFDX_AUTH_URL_RELEASE}} > ./SFDX_AUTH_URL.txt
             
