@@ -41,11 +41,11 @@ jobs:
               id: extract_branch
               run: |
                 if [[ "${GITHUB_EVENT_NAME}" == "push" ]]; then
-                    echo "branch = $(echo ${GITHUB_REF##*/})" >> "$GITHUB_OUTPUT"
+                    echo "::set-output name=branch::$(echo ${GITHUB_REF##*/})"
                 elif [[ "${GITHUB_EVENT_NAME}" == "pull_request" ]]; then
-                    echo "branch = $(echo $GITHUB_BASE_REF)" >> "$GITHUB_OUTPUT"
+                    echo "::set-output name=branch::$(echo $GITHUB_BASE_REF)"
                 else
-                    echo "branch = INVALID_EVENT_BRANCH_UNKNOWN" >> "$GITHUB_OUTPUT"
+                    echo "::set-output name=branch::INVALID_EVENT_BRANCH_UNKNOWN"
                 fi
 
             ##Populate auth file with SFDX_URL secret of deployment destination.
