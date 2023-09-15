@@ -84,6 +84,10 @@ jobs:
                   mkdir changed-sources
                   sfdx sgd:source:delta --to "HEAD" --from "HEAD^" --output changed-sources/ --generate-delta --source force-app/ 
 
+                  
+            - name: 'Show files changed'
+              run: cat changed-sources/
+              
             - name: 'Setup PMD'
               uses: legetz/setup-pmd@7.0.0-rc3
               
