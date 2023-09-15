@@ -84,6 +84,7 @@ jobs:
                   mkdir changed-sources
                   sfdx sgd:source:delta --to "HEAD" --from "HEAD^" --output changed-sources/ --generate-delta --source force-app/ 
 
+              
             - name: 'Setup PMD'
               uses: legetz/setup-pmd@7.0.0-rc3
               
@@ -97,4 +98,4 @@ jobs:
                   
             - name: 'Deploy destructive changes (if any)'
               run: |
-                  sfdx force:mdapi:deploy -d "changed-sources/destructiveChanges" --checkonly --ignorewarnings
+                  sfdx force:mdapi:deploy -d "changed-sources/destructiveChanges" --checkonly --ignorewarnings --json

@@ -83,5 +83,5 @@ jobs:
               
             - name: 'Deploy destructive changes (if any)'
               run: |
-                  sfdx force:mdapi:deploy -d "changed-sources/destructiveChanges" --ignorewarnings
+                  sfdx force:mdapi:deploy -d "changed-sources/destructiveChanges" --ignorewarnings --json
 
