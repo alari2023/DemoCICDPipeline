@@ -6,35 +6,15 @@
 	</types>
 	<types>
 		<members>*</members>
-		<name>ApexComponent</name>
-	</types>
-	<types>
-		<members>*</members>
-		<name>ApexPage</name>
-	</types>
-	<types>
-		<members>*</members>
 		<name>ApexTrigger</name>
 	</types>
 	<types>
-		<members>Trailshred_Setting__mdt.Active__c</members>
-		<members>Trailshred_Setting__mdt.Audio_Static_Resource_Path__c</members>
-		<members>Trailshred_Setting__mdt.Field_Name__c</members>
-		<members>Trailshred_Setting__mdt.Field_Value__c</members>
-		<members>Trailshred_Setting__mdt.Object_Name__c</members>
+		<members>Account.Test_Update_Field__c</members>
 		<name>CustomField</name>
 	</types>
 	<types>
-		<members>*</members>
-		<name>CustomMetadata</name>
-	</types>
-	<types>
-		<members>*</members>
-		<name>LightningComponentBundle</name>
-	</types>
-	<types>
-		<members>*</members>
-		<name>StaticResource</name>
+		<members>Trailshred_Setting__mdt</members>
+		<name>CustomObject</name>
 	</types>
 	<version>55.0</version>
 </Package>
