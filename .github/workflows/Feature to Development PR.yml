@@ -86,7 +86,7 @@ jobs:
 
                   
             - name: 'Show files changed'
-              run: cat changed-sources/package.xml
+              run: cat changed-sources/packages/package.xml
               
             - name: 'Setup PMD'
               uses: legetz/setup-pmd@7.0.0-rc3
