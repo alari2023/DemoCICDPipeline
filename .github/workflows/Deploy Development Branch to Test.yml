@@ -54,7 +54,10 @@ jobs:
 
             - name: 'Output branch name'
               run: |
-               echo "::error::Branch $steps.extract_branch.outputs.branch doesn't match possible files"
+               BRANCH="${{ steps.extract_branch.outputs.branch }}"
+               run: echo "Branch name is $BRANCH"
+
+               
             ##Populate auth file with SFDX_URL secret of deployment destination.
             - name: 'Populate auth file with SFDX_URL secret of ST deployment destination'
               shell: bash
