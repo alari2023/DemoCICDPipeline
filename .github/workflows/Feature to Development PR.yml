@@ -61,7 +61,7 @@ jobs:
             ##Populate auth file with SFDX_URL secret of release destination.
             - name: 'Populate auth file with SFDX_URL secret of release deployment destination'
               shell: bash            
-              if: ${{ contains(github.event.pull_request.base.ref,'release') }}
+              if: ${{ contains(github.event.pull_request.base.ref,'release/') }}
               run: |
                   echo ${{ secrets.SFDX_AUTH_URL_RELEASE}} > ./SFDX_AUTH_URL.txt
             
@@ -87,7 +87,7 @@ jobs:
             - name: 'Setup PMD'
               uses: legetz/setup-pmd@7.0.0-rc3
               
-            - name: 'APEX full scan'
+            - name: 'Apex changes scan'
               if: ${{ hashFiles('changed-sources/force-app/main/default/classes/*.cls') != '' }}
               run: pmd check --dir changed-sources/force-app/main/default/classes/*.cls --rulesets ./pmd-rules.xml -f text
 
@@ -95,6 +95,6 @@ jobs:
               run: |
                   sfdx force:source:deploy -p "changed-sources/force-app" --checkonly --testlevel RunLocalTests  --json
                   
-            - name: 'Deploy destructive changes (if any)'
+            - name: 'Check-only deploy destructive changes (if any)'
               run: |
                   sfdx force:mdapi:deploy -d "changed-sources/destructiveChanges" --checkonly --ignorewarnings --json
