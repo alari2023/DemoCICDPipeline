@@ -54,6 +54,8 @@ jobs:
 
             - name: 'Output branch name'
               run: |
+               test1 = $GITHUB_BASE_REF
+               test2 = ${GITHUB_REF##*/}
                BRANCH="${{ steps.extract_branch.outputs.branch }}"
                echo "Branch name is $BRANCH"
 
