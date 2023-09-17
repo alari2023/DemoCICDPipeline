@@ -55,7 +55,7 @@ jobs:
             - name: 'Output branch name'
               run: |
                BRANCH="${{ steps.extract_branch.outputs.branch }}"
-               run: echo "Branch name is $BRANCH"
+               echo "Branch name is $BRANCH"
 
                
             ##Populate auth file with SFDX_URL secret of deployment destination.
