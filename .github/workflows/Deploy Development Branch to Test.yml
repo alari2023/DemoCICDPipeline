@@ -61,7 +61,7 @@ jobs:
             ##Populate auth file with SFDX_URL secret of release destination.
             - name: 'Populate auth file with SFDX_URL secret of release deployment destination'
               shell: bash            
-              if: ${{ contains(steps.extract_branch.outputs.branch,'release') }}
+              if: ${{ contains(steps.extract_branch.outputs.branch,'release/') }}
               run: |
                   echo ${{ secrets.SFDX_AUTH_URL_RELEASE}} > ./SFDX_AUTH_URL.txt
             
@@ -81,10 +81,9 @@ jobs:
             - name: 'Authenticate to deployment org'
               run: sfdx auth:sfdxurl:store -f ./SFDX_AUTH_URL.txt -s -a deployment
 
-            - name: 'Deploy the entire branch to Test Org org'
+            - name: 'Deploy the changes in branch to deployment destination'
               run: sfdx force:source:deploy -p "changed-sources/force-app"  --testlevel RunLocalTests --json
               
-            - name: 'Deploy destructive changes (if any)'
+            - name: 'Deploy destructive changes (if any) to deployment destination'
               run: |
                   sfdx force:mdapi:deploy -d "changed-sources/destructiveChanges" --ignorewarnings --json
-
