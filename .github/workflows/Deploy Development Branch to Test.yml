@@ -65,7 +65,7 @@ jobs:
             ##Populate auth file with SFDX_URL secret of release destination.
             - name: 'Populate auth file with SFDX_URL secret of release deployment destination'
               shell: bash            
-              if: ${{ contains(steps.extract_branch.outputs.branch,'release/') }}
+              if: ${{ contains(steps.extract_branch.outputs.branch,'release') }}
               run: |
                   echo ${{ secrets.SFDX_AUTH_URL_RELEASE}} > ./SFDX_AUTH_URL.txt
             
