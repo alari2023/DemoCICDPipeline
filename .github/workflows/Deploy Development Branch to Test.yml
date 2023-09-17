@@ -51,6 +51,10 @@ jobs:
                     echo "branch=INVALID_EVENT_BRANCH_UNKNOWN" >> $GITHUB_OUTPUT
                 fi
 
+
+            - name: 'Output branch name'
+              run: |
+               echo "::error::Branch $steps.extract_branch.outputs.branch doesn't match possible files"
             ##Populate auth file with SFDX_URL secret of deployment destination.
             - name: 'Populate auth file with SFDX_URL secret of ST deployment destination'
               shell: bash
