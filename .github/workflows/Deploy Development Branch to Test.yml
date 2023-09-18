@@ -42,7 +42,7 @@ jobs:
               run: |
                 if [[ "${GITHUB_EVENT_NAME}" == "push" ]]; then
                     #echo "::set-output name=branch::$(echo  ${GITHUB_REF#refs/heads/})"
-                    echo "branch=$(echo ${GITHUB_REF##*/})" >> $GITHUB_OUTPUT
+                    echo "branch=$(echo ${GITHUB_REF#refs/heads/})" >> $GITHUB_OUTPUT
                 elif [[ "${GITHUB_EVENT_NAME}" == "pull_request" ]]; then
                     #echo "::set-output name=branch::$(echo $GITHUB_BASE_REF)"
                     echo "branch=$(echo $GITHUB_BASE_REF)" >> $GITHUB_OUTPUT
@@ -54,8 +54,6 @@ jobs:
 
             - name: 'Output branch name'
               run: |
-               test1 = $GITHUB_BASE_REF
-               test2 = ${GITHUB_REF##*/}
                BRANCH="${{ steps.extract_branch.outputs.branch }}"
                echo "Branch name is $BRANCH"
 
