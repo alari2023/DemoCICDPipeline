@@ -91,7 +91,7 @@ jobs:
               
             - name: 'Apex changes scan'
               if: ${{ hashFiles('changed-sources/force-app/main/default/classes/*.cls') != '' }}
-              run: pmd check --dir changed-sources/force-app/main/default/classes/*.cls --rulesets ./pmd-rules.xml -f text --r ./
+              run: pmd check --dir changed-sources/force-app/main/default/classes/*.cls --rulesets ./pmd-rules.xml -f text -r ./
                  
             - name: 'No apex code scan'
               uses: actions/github-script@v6
