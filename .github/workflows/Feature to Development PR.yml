@@ -124,9 +124,15 @@ jobs:
                     repo: context.repo.repo,
                     body: 'No Apex code scan run'
                     })
+
+
+            - name: 'Convert to metadata'
+              run: |
+                  sfdx force:source:convert -r changed-sources/force-app -d ./toDeploy -n 'My Package'
+                  
             - name: 'Check-only deploy delta changes - run all tests'
               run: |
-                  sfdx force:source:deploy -p "changed-sources/force-app" --checkonly --testlevel RunLocalTests  --json
+                  sfdx force:source:deploy -p "changed-sources/force-app" --checkonly --testlevel RunLocalTests  --json   
                   
             - name: 'Check-only deploy destructive changes (if any)'
               run: |
