@@ -44,10 +44,6 @@
                 <behavior>Edit</behavior>
                 <field>Contract_extra_field_one__c</field>
             </layoutItems>
-            <layoutItems>
-                <behavior>Readonly</behavior>
-                <field>Date_Field_Test__c</field>
-            </layoutItems>
         </layoutColumns>
         <layoutColumns>
             <layoutItems>
