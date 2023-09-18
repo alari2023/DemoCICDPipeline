@@ -86,6 +86,16 @@ jobs:
                   mkdir changed-sources
                   sfdx sgd:source:delta --to "HEAD" --from "HEAD^" --output changed-sources/ --generate-delta --source force-app/ 
 
+
+
+            - name: 'Upload change sources file'
+              if: success() || failure()
+              uses: actions/upload-artifact@v3
+              with:
+                name: changedSources
+                path: changed-sources/package/package.xml
+                if-no-files-found: warn # 'warn' or 'ignore' are also available, defaults to `warn`
+
             - name: 'Setup PMD'
               uses: legetz/setup-pmd@7.0.0-rc3
               
@@ -124,9 +134,15 @@ jobs:
                     repo: context.repo.repo,
                     body: 'No Apex code scan run'
                     })
+
+
+            - name: 'Convert to metadata'
+              run: |
+                  sfdx force:source:convert -r changed-sources/force-app -d ./toDeploy -n 'My Package'
+                  
             - name: 'Check-only deploy delta changes - run all tests'
               run: |
-                  sfdx force:source:deploy -p "changed-sources/force-app" --checkonly --testlevel RunLocalTests  --json
+                  sfdx force:source:deploy -p "changed-sources/force-app" --checkonly --testlevel RunLocalTests  --json   
                   
             - name: 'Check-only deploy destructive changes (if any)'
               run: |
