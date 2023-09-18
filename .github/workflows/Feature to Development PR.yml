@@ -90,11 +90,20 @@ jobs:
 
             - name: 'Upload change sources file'
               if: success() || failure()
-              uses: actions/upload-artifact@v3
+              uses: actions/upload-artifact@v3   #changed-sources/destructiveChanges
               with:
-                name: changedSources
+                name: changedOrUpdatedComponents
                 path: changed-sources/package/package.xml
                 if-no-files-found: warn # 'warn' or 'ignore' are also available, defaults to `warn`
+
+            - name: 'Upload destructive source file'
+              if: success() || failure()
+              uses: actions/upload-artifact@v3   #changed-sources/destructiveChanges
+              with:
+                name: DeletedComponents
+                path: changed-sources/destructiveChanges/package/package.xml
+                if-no-files-found: warn # 'warn' or 'ignore' are also available, defaults to `warn`
+                
 
             - name: 'Setup PMD'
               uses: legetz/setup-pmd@7.0.0-rc3
@@ -120,7 +129,7 @@ jobs:
                     issue_number: context.issue.number,
                     owner: context.repo.owner,
                     repo: context.repo.repo,
-                    body: 'Apex classes failed PMD scan'
+                    body: 'Apex classes failed PMD scan - check workflow logs'
                     })
             
             - name: 'No apex code scan'
@@ -134,16 +143,37 @@ jobs:
                     repo: context.repo.repo,
                     body: 'No Apex code scan run'
                     })
-
-
-            - name: 'Convert to metadata'
-              run: |
-                  sfdx force:source:convert -r changed-sources/force-app -d ./toDeploy -n 'My Package'
                   
-            - name: 'Check-only deploy delta changes - run all tests'
+            - name: 'Check-only deploy delta'
               run: |
                   sfdx force:source:deploy -p "changed-sources/force-app" --checkonly --testlevel RunLocalTests  --json   
-                  
-            - name: 'Check-only deploy destructive changes (if any)'
+
+
+            - name: 'Test deployment failed'
+              uses: actions/github-script@v6
+              if: failure() && steps.Check-only-deploy-delta.outcome != 'success'
+              with:
+                  script: |
+                    github.rest.issues.createComment({
+                    issue_number: context.issue.number,
+                    owner: context.repo.owner,
+                    repo: context.repo.repo,
+                    body: 'Salesforce deployment failed - check workflow logs'
+                    })
+                    
+            - name: 'Check-only deploy destructive changes'
               run: |
                   sfdx force:mdapi:deploy -d "changed-sources/destructiveChanges" --checkonly --ignorewarnings --json
+
+
+            - name: 'Test destructive deployment failed'
+              uses: actions/github-script@v6
+              if: failure() && steps.Check-only-deploy-delta.outcome != 'success'
+              with:
+                  script: |
+                    github.rest.issues.createComment({
+                    issue_number: context.issue.number,
+                    owner: context.repo.owner,
+                    repo: context.repo.repo,
+                    body: 'Salesforce destructive deployment failed - check workflow logs'
+                    })
