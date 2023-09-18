@@ -94,14 +94,14 @@ jobs:
               run: pmd check --dir changed-sources/force-app/main/default/classes/*.cls --rulesets ./pmd-rules.xml -f text -r ./pmdResults/pmdResult.sarif
 
             - name: 'Upload PMD file'
-              if:  success() || failure()
+              if: success() || failure()
               uses: actions/upload-artifact@v3
               with:
                 name: pmd-scan-report
                 path: ./pmdResults/pmdResult.sarif
                 if-no-files-found: warn # 'warn' or 'ignore' are also available, defaults to `warn`
                  
-            - name: 'No apex code scan'
+            - name: 'Apex code scan failed'
               uses: actions/github-script@v6
               if: failure() && steps.Apex-changes-scan.outcome != 'success'
               with:
