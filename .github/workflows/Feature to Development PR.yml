@@ -93,7 +93,9 @@ jobs:
               if: ${{ hashFiles('changed-sources/force-app/main/default/classes/*.cls') != '' }}
               run: pmd check --dir changed-sources/force-app/main/default/classes/*.cls --rulesets ./pmd-rules.xml -f text -r ./pmdResults/pmdResult.sarif
 
-            - uses: actions/upload-artifact@v3
+            - name: 'Upload PMD file'
+              if: success() || failure()
+              uses: actions/upload-artifact@v3
               with:
                 name: pmd-scan-report
                 path: ./pmdResults/pmdResult.sarif
