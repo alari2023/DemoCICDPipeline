@@ -91,7 +91,12 @@ jobs:
               
             - name: 'Apex changes scan'
               if: ${{ hashFiles('changed-sources/force-app/main/default/classes/*.cls') != '' }}
-              run: pmd check --dir changed-sources/force-app/main/default/classes/*.cls --rulesets ./pmd-rules.xml -f text -r ./pmdResult.sarif
+              run: pmd check --dir changed-sources/force-app/main/default/classes/*.cls --rulesets ./pmd-rules.xml -f text -r ./pmdResults/pmdResult.sarif
+
+            - uses: actions/upload-artifact@v3
+              with:
+                name: pmd-scan-report
+                path: ./pmdResults/pmdResult.sarif
                  
             - name: 'No apex code scan'
               uses: actions/github-script@v6
