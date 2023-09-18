@@ -2,7 +2,8 @@
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>Date_Field_Test__c</fullName>
     <externalId>false</externalId>
-    <formula>NOW()</formula>
+    <formula>TODAY()</formula>
+    <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
     <label>Date Field Test</label>
     <required>false</required>
     <type>Date</type>
