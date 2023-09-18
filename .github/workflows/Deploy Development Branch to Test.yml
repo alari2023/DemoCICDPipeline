@@ -41,7 +41,7 @@ jobs:
               id: extract_branch
               run: |
                 if [[ "${GITHUB_EVENT_NAME}" == "push" ]]; then
-                    #echo "::set-output name=branch::$(echo ${GITHUB_REF##*/})"
+                    #echo "::set-output name=branch::$(echo  ${GITHUB_REF#refs/heads/})"
                     echo "branch=$(echo ${GITHUB_REF##*/})" >> $GITHUB_OUTPUT
                 elif [[ "${GITHUB_EVENT_NAME}" == "pull_request" ]]; then
                     #echo "::set-output name=branch::$(echo $GITHUB_BASE_REF)"
