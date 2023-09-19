@@ -151,7 +151,7 @@ jobs:
 
             - name: 'Test deployment failed'
               uses: actions/github-script@v6
-              if: steps.Check-only-deploy-delta.outcome == 'failed'
+              if: failure() && steps.Check-only-deploy-delta.outcome == 'failed'
               with:
                   script: |
                     github.rest.issues.createComment({
@@ -168,7 +168,7 @@ jobs:
 
             - name: 'Test destructive deployment failed'
               uses: actions/github-script@v6
-              if: steps.Check-only-deploy-delta.outcome == 'failed'
+              if: failure() && steps.Check-only-deploy-delta.outcome == 'failed'
               with:
                   script: |
                     github.rest.issues.createComment({
