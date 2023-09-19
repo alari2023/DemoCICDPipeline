@@ -58,7 +58,7 @@ jobs:
               shell: bash
               if: ${{ github.event.pull_request.base.ref == 'develop' }}
               run: |
-                  echo ${{ secrets.SFDX_AUTH_URL_DEMOST}} > ./SFDX_AUTH_URL.txt
+                  echo ${{ secrets.SFDX_AUTH_URL_ST}} > ./SFDX_AUTH_URL.txt
             
             ##Populate auth file with SFDX_URL secret of release destination.
             - name: 'Populate auth file with SFDX_URL secret of release deployment destination'
