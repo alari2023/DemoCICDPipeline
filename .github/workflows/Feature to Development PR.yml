@@ -101,7 +101,7 @@ jobs:
               uses: actions/upload-artifact@v3   #changed-sources/destructiveChanges
               with:
                 name: DeletedComponents
-                path: changed-sources/destructiveChanges/package/package.xml
+                path: changed-sources/destructiveChanges/destructiveChanges.xml
                 if-no-files-found: warn # 'warn' or 'ignore' are also available, defaults to `warn`
                 
 
