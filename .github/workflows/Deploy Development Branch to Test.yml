@@ -84,6 +84,24 @@ jobs:
                   mkdir changed-sources
                   sfdx sgd:source:delta --to "HEAD" --from "HEAD^" --output changed-sources/ --generate-delta --source force-app/
 
+
+
+            - name: 'Upload change sources file'
+              if: success() || failure()
+              uses: actions/upload-artifact@v3   #changed-sources/destructiveChanges
+              with:
+                name: changedOrUpdatedComponents
+                path: changed-sources/package/package.xml
+                if-no-files-found: warn # 'warn' or 'ignore' are also available, defaults to `warn`
+
+            - name: 'Upload destructive source file'
+              if: success() || failure()
+              uses: actions/upload-artifact@v3   #changed-sources/destructiveChanges
+              with:
+                name: DeletedComponents
+                path: changed-sources/destructiveChanges/destructiveChanges.xml
+                if-no-files-found: warn # 'warn' or 'ignore' are also available, defaults to `warn`
+                
             # Authenticate to org
             - name: 'Authenticate to deployment org'
               run: sfdx auth:sfdxurl:store -f ./SFDX_AUTH_URL.txt -s -a deployment
