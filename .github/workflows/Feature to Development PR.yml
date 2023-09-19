@@ -87,12 +87,12 @@ jobs:
                   sfdx sgd:source:delta --to "HEAD" --from "HEAD^" --output changed-sources/ --generate-delta --source force-app/ 
 
 
-
+            #Uploads a package.xml file of all the components that SFDX git delta has identified as created or modified 
             - name: 'Upload change sources file'
               if: success() || failure()
               uses: actions/upload-artifact@v3   #changed-sources/destructiveChanges
               with:
-                name: changedOrUpdatedComponents
+                name: ChangedOrUpdatedComponents
                 path: changed-sources/package/package.xml
                 if-no-files-found: warn # 'warn' or 'ignore' are also available, defaults to `warn`
 
@@ -110,19 +110,19 @@ jobs:
               
             - name: 'Apex changes scan'
               if: ${{ hashFiles('changed-sources/force-app/main/default/classes/*.cls') != '' }}
-              run: pmd check --dir changed-sources/force-app/main/default/classes/*.cls --rulesets ./pmd-rules.xml -f text -r ./pmdResults/pmdResult.sarif
+              run: pmd check --dir changed-sources/force-app/main/default/classes/*.cls --rulesets ./pmd-rules.xml -f text -r ./pmdResults/PmdResults.sarif
 
             - name: 'Upload PMD file'
               if:  failure()
               uses: actions/upload-artifact@v3
               with:
                 name: pmd-scan-report
-                path: ./pmdResults/pmdResult.sarif
+                path: ./pmdResults/PmdResults.sarif
                 if-no-files-found: warn # 'warn' or 'ignore' are also available, defaults to `warn`
                  
             - name: 'Apex code scan failed'
               uses: actions/github-script@v6
-              if: steps.Apex-changes-scan.outcome != 'success'
+              if: failure() && steps.Apex-changes-scan.outcome != 'success'
               with:
                   script: |
                     github.rest.issues.createComment({
@@ -151,7 +151,7 @@ jobs:
 
             - name: 'Test deployment failed'
               uses: actions/github-script@v6
-              if: steps.Check-only-deploy-delta.outcome != 'success'
+              if: steps.Check-only-deploy-delta.outcome == 'failed'
               with:
                   script: |
                     github.rest.issues.createComment({
@@ -168,7 +168,7 @@ jobs:
 
             - name: 'Test destructive deployment failed'
               uses: actions/github-script@v6
-              if: steps.Check-only-deploy-delta.outcome != 'success'
+              if: steps.Check-only-deploy-delta.outcome == 'failed'
               with:
                   script: |
                     github.rest.issues.createComment({
