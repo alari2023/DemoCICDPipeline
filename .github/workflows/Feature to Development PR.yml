@@ -162,6 +162,7 @@ jobs:
                     })
                   
             - name: 'Output  name'
+              if: failure()
               run: |
                BRANCH="${{ steps.Check-only-deploy-delta.outcome }}"
                echo "Test name is $BRANCH"
