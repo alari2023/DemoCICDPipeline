@@ -123,7 +123,7 @@ jobs:
                  
             - name: 'Apex code scan failed'
               uses: actions/github-script@v6
-              if: failure() && steps.Codescan.outcome != 'success'
+              if: failure() && steps.Codescan.outcome == 'failure'
               with:
                   script: |
                     github.rest.issues.createComment({
@@ -153,7 +153,7 @@ jobs:
 
             - name: 'Test deployment failed'
               uses: actions/github-script@v6
-              if: failure() && steps.Check-only-deploy-delta.outcome != 'success'
+              if: failure() && steps.Check-only-deploy-delta.outcome == 'failure'
               with:
                   script: |
                     github.rest.issues.createComment({
@@ -172,7 +172,7 @@ jobs:
 
             - name: 'Test destructive deployment failed'
               uses: actions/github-script@v6
-              if: failure() && steps.CheckDestructiveDeploy.outcome != 'success'
+              if: failure() && steps.CheckDestructiveDeploy.outcome == 'failure'
               with:
                   script: |
                     github.rest.issues.createComment({
