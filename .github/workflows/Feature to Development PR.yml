@@ -148,7 +148,12 @@ jobs:
               run: |
                   sfdx force:source:deploy -p "changed-sources/force-app" --checkonly --testlevel RunLocalTests  --json   
 
-
+            - name: 'Output  name'
+              run: |
+              if: failure()
+               BRANCH="${{ steps.Apex-changes-scan.outcome }}"
+               echo "Test name is $BRANCH"
+               
             - name: 'Test deployment failed'
               uses: actions/github-script@v6
               if: failure() && steps.Check-only-deploy-delta.outcome != 'success'
@@ -161,12 +166,7 @@ jobs:
                     body: 'Salesforce deployment failed - check workflow logs'
                     })
                   
-            - name: 'Output  name'
-              run: |
-              if: failure()
-               BRANCH="${{ steps.Apex-changes-scan.outcome }}"
-               echo "Test name is $BRANCH"
-               
+
             - name: 'Check-only deploy destructive changes'
               run: |
                   sfdx force:mdapi:deploy -d "changed-sources/destructiveChanges" --checkonly --ignorewarnings --json
