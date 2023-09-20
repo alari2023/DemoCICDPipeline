@@ -162,9 +162,8 @@ jobs:
                     })
                   
             - name: 'Output  name'
-              if: failure()
               run: |
-               BRANCH="${{ steps.Check-only-deploy-delta.outcome }}"
+               BRANCH="${{ steps.Apex-changes-scan.outcome }}"
                echo "Test name is $BRANCH"
                
             - name: 'Check-only deploy destructive changes'
