@@ -65,7 +65,7 @@ jobs:
               shell: bash            
               if: ${{ contains(github.event.pull_request.base.ref,'release/') }}
               run: |
-                  echo ${{ secrets.SFDX_AUTH_URL_RELEASE}} > ./SFDX_AUTH_URL.txt
+                  echo ${{ secrets.SFDX_AUTH_URL_UAT}} > ./SFDX_AUTH_URL.txt
             
             ##Populate auth file with SFDX_URL secret of prod destination.
             - name: 'Populate auth file with SFDX_URL secret of production deployment destination'
@@ -122,7 +122,7 @@ jobs:
                  
             - name: 'Apex code scan failed'
               uses: actions/github-script@v6
-              if: failure() && steps.Apex-changes-scan.outcome != 'success'
+              if: failure() && steps.Apex-changes-scan.outcome != 'success' && steps.Apex-changes-scan.outcome != 'skipped'
               with:
                   script: |
                     github.rest.issues.createComment({
