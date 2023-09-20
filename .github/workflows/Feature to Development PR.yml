@@ -151,7 +151,7 @@ jobs:
 
             - name: 'Test deployment failed'
               uses: actions/github-script@v6
-              if: failure() && steps.Check-only-deploy-delta.outcome != 'success' && steps.Check-only-deploy-delta.outcome != 'skipped'
+              if: failure() && steps.Check-only-deploy-delta.outcome != 'success'
               with:
                   script: |
                     github.rest.issues.createComment({
@@ -160,7 +160,12 @@ jobs:
                     repo: context.repo.repo,
                     body: 'Salesforce deployment failed - check workflow logs'
                     })
-                    
+                  
+            - name: 'Output  name'
+              run: |
+               BRANCH="${{ steps.Check-only-deploy-delta.outcome }}"
+               echo "Test name is $BRANCH"
+               
             - name: 'Check-only deploy destructive changes'
               run: |
                   sfdx force:mdapi:deploy -d "changed-sources/destructiveChanges" --checkonly --ignorewarnings --json
@@ -168,7 +173,7 @@ jobs:
 
             - name: 'Test destructive deployment failed'
               uses: actions/github-script@v6
-              if: failure() && steps.Check-only-deploy-destructive-changes.outcome != 'success' && steps.Check-only-deploy-destructive-changes.outcome != 'skipped'
+              if: failure() && steps.Check-only-deploy-destructive-changes.outcome != 'success'
               with:
                   script: |
                     github.rest.issues.createComment({
