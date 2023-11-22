@@ -1,4 +1,4 @@
-public class lowerCaseClass 
+public class LowerCaseClass 
 {
     public static void lowerCaseClass()
     {
