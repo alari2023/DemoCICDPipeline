@@ -34,7 +34,7 @@ jobs:
             - name: 'Checkout source code'
               uses: actions/checkout@v3
               with:
-                token: ${{ secrets.ACCESS_TOKEN }}
+                #token: ${{ secrets.ACCESS_TOKEN }}
                 fetch-depth: 0
             
             # Install Salesforce CLI
