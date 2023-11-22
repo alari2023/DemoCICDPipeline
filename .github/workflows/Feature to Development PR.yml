@@ -102,7 +102,7 @@ jobs:
                 mkdir -p changed-sources
                 cp -R force-app/ changed-sources/
                 find force-app/main/default/ -name "*.xml" -type f -exec dirname {} \; | sort -u | xargs -I {} echo '<types><members>*</members><name>'{}'</name></types>' > changed-sources/package.xml
-                echo '<version>53.0</version>' >> changed-sources/package.xml
+                echo '<version>59.0</version>' >> changed-sources/package/package.xml
 
 
             - name: 'Debug full package deployment'
