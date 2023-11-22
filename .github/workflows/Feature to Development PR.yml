@@ -100,8 +100,8 @@ jobs:
               if: ${{ env.SFDX_DEPLOYMENT_TYPE == 'FULL' }}
               run: | 
                     mkdir changed-sources
-                    sfdx force:source:manifest:create -r force-app -c -f changed-sources/package/package.xml
-                    sfdx force:source:retrieve -x changed-sources/package/package.xml -u deployment              
+                    sfdx force:project:manifest:create -p force-app -c -f changed-sources/package/package.xml
+                    sfdx force:source:retrieve -x changed-sources/package/package.xml -u deployment       
 
 
             # Uploads a package.xml file of all the components that SFDX git delta has identified as created or modified 
