@@ -81,8 +81,9 @@ jobs:
 
 
             - name: Debug SFDX_DEPLOYMENT_TYPE_SIT
-              run: 
+              run: |
                   echo "SFDX_DEPLOYMENT_TYPE_SIT: ${{ env.SFDX_DEPLOYMENT_TYPE_SIT }}"
+
   
             # Authenticate to org using the URL stored in the text file
             - name: 'Authenticate to deployment org'
