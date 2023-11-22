@@ -60,7 +60,7 @@ jobs:
               if: ${{ github.event.pull_request.base.ref == 'develop' }}
               run: |
                   echo ${{ secrets.SFDX_AUTH_URL_ST}} > ./SFDX_AUTH_URL.txt
-                  export SFDX_DEPLOYMENT_TYPE=${{ env.SFDX_DEPLOYMENT_TYPE_SIT }}
+                  export SFDX_DEPLOYMENT_TYPE='DELTA'
             
             # Populate auth file with SFDX_URL secret of release destination.
             - name: 'Populate auth file with SFDX_URL secret of release deployment destination'
