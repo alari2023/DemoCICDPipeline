@@ -11,7 +11,7 @@ on:
 
 # Jobs to be executed
 jobs:
-    deploy-branch-to-Test-Org:
+    deploy-branch-to-Org:
         runs-on: ubuntu-latest
         if: ${{ github.actor != 'dependabot[bot]' }}
         steps:
@@ -34,9 +34,10 @@ jobs:
             - name: 'Checkout source code'
               uses: actions/checkout@v3
               with:
+                token: ${{ secrets.ACCESS_TOKEN }}
                 fetch-depth: 0
                 
-                
+            # Gets the branch name that the deployment is running on - this drives which org is the destination org     
             - name: Branch used
               id: extract_branch
               run: |
@@ -51,64 +52,85 @@ jobs:
                     echo "branch=INVALID_EVENT_BRANCH_UNKNOWN" >> $GITHUB_OUTPUT
                 fi
 
-
-            - name: 'Output branch name'
-              run: |
-               BRANCH="${{ steps.extract_branch.outputs.branch }}"
-               echo "Branch name is $BRANCH"
-
                
-            ##Populate auth file with SFDX_URL secret of deployment destination.
+            # Populate auth file with SFDX_URL secret of deployment destination.
             - name: 'Populate auth file with SFDX_URL secret of ST deployment destination'
               shell: bash
               if: ${{ steps.extract_branch.outputs.branch == 'develop' }}
               run: |
-                  echo ${{ secrets.SFDX_AUTH_URL_DEMOST}} > ./SFDX_AUTH_URL.txt
+                  echo ${{ secrets.SFDX_AUTH_URL_ST}} > ./SFDX_AUTH_URL.txt
+                  export SFDX_DEPLOYMENT_TYPE=${{ env.SFDX_DEPLOYMENT_TYPE_SIT }}
             
-            ##Populate auth file with SFDX_URL secret of release destination.
+            # Populate auth file with SFDX_URL secret of release destination.
             - name: 'Populate auth file with SFDX_URL secret of release deployment destination'
               shell: bash            
               if: ${{ contains(steps.extract_branch.outputs.branch,'release/') }}
               run: |
-                  echo ${{ secrets.SFDX_AUTH_URL_RELEASE}} > ./SFDX_AUTH_URL.txt
+                  echo ${{ secrets.SFDX_AUTH_URL_UAT}} > ./SFDX_AUTH_URL.txt
+                  export SFDX_DEPLOYMENT_TYPE=${{ env.SFDX_DEPLOYMENT_TYPE_UAT }}
             
-            ##Populate auth file with SFDX_URL secret of prod destination.
+            # Populate auth file with SFDX_URL secret of prod destination.
             - name: 'Populate auth file with SFDX_URL secret of production deployment destination'
               shell: bash
               if: ${{ steps.extract_branch.outputs.branch == 'master' }}
               run: |
                   echo ${{ secrets.SFDX_AUTH_URL_PROD}} > ./SFDX_AUTH_URL.txt
-                  
+                  export SFDX_DEPLOYMENT_TYPE=${{ env.SFDX_DEPLOYMENT_TYPE_PROD }}
+            
+            # We use SFDX Git Delta to create a directory with only the metadata that has changed.
+            # this allows us to deploy only those changes, as opposed to deploying the entire branch. 
+            # This helps reducing deployment times          
             - name: 'Create delta packages for new, modified or deleted metadata'
+            if: ${{ env.SFDX_DEPLOYMENT_TYPE == 'DELTA' }}
               run: | 
                   mkdir changed-sources
                   sfdx sgd:source:delta --to "HEAD" --from "HEAD^" --output changed-sources/ --generate-delta --source force-app/
+                  
+            # Create full package for entire branch deployment
+            - name: 'Create full package for entire branch deployment'
+              if: ${{ env.SFDX_DEPLOYMENT_TYPE == 'FULL' }}
+              run: | 
+                    mkdir changed-sources
+                    cp -R force-app/ changed-sources/                
 
 
-
+            # Uploads a package.xml file of all the components that SFDX git delta has identified as created or modified 
             - name: 'Upload change sources file'
               if: success() || failure()
-              uses: actions/upload-artifact@v3   #changed-sources/destructiveChanges
+              uses: actions/upload-artifact@v3   
               with:
-                name: changedOrUpdatedComponents
+                name: Changed-Updated-Components
                 path: changed-sources/package/package.xml
                 if-no-files-found: warn # 'warn' or 'ignore' are also available, defaults to `warn`
-
+            
+            # Uploads a package.xml file of all the components that SFDX git delta has identified as deleted
             - name: 'Upload destructive source file'
               if: success() || failure()
-              uses: actions/upload-artifact@v3   #changed-sources/destructiveChanges
+              uses: actions/upload-artifact@v3   
               with:
-                name: DeletedComponents
+                name: Deleted-Components
                 path: changed-sources/destructiveChanges/destructiveChanges.xml
                 if-no-files-found: warn # 'warn' or 'ignore' are also available, defaults to `warn`
                 
             # Authenticate to org
             - name: 'Authenticate to deployment org'
               run: sfdx auth:sfdxurl:store -f ./SFDX_AUTH_URL.txt -s -a deployment
-
-            - name: 'Deploy the changes in branch to deployment destination'
-              run: sfdx force:source:deploy -p "changed-sources/force-app"  --testlevel RunLocalTests --json
               
+            # Performs a delta deployment to the destination org 
+            - name: 'Deploy the changes in branch to deployment destination'
+              run: 
+                if [ -n "$(ls -A changed-sources)" ]; then
+                    sfdx force:source:deploy -p "changed-sources/force-app"  --testlevel RunLocalTests --json
+                else
+                    echo "No changes in the 'changed-sources' directory. Skipping deployment."
+                fi   
+              
+            # Performs a destructive deployment to the destination org
             - name: 'Deploy destructive changes (if any) to deployment destination'
               run: |
-                  sfdx force:mdapi:deploy -d "changed-sources/destructiveChanges" --ignorewarnings --json
+                result=$(sfdx force:mdapi:deploy -d "changed-sources/destructiveChanges" --ignorewarnings --json)
+                status=$(echo $result | jq -r '.status')
+                if [ "$status" != "0" ]; then
+                    echo "Destructive changes deployment failed."
+                exit 1
+                fi
