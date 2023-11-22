@@ -105,6 +105,12 @@ jobs:
                 echo '<version>53.0</version>' >> changed-sources/package.xml
 
 
+            - name: 'Debug full package deployment'
+              run: |
+                ls -R changed-sources
+                ls -R changed-sources/force-app
+
+
             # Uploads a package.xml file of all the components that SFDX git delta has identified as created or modified 
             - name: 'Upload change sources file'
               if: success() || failure()
