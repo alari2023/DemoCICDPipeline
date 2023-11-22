@@ -100,8 +100,9 @@ jobs:
               if: ${{ env.SFDX_DEPLOYMENT_TYPE == 'FULL' }}
               run: | 
                 mkdir -p changed-sources
+                mkdir -p changed-sources/package
                 cp -R force-app/ changed-sources/
-                find force-app/main/default/ -name "*.xml" -type f -exec dirname {} \; | sort -u | xargs -I {} echo '<types><members>*</members><name>'{}'</name></types>' > changed-sources/package.xml
+                find force-app/main/default/ -name "*.xml" -type f -exec dirname {} \; | sort -u | xargs -I {} echo '<types><members>*</members><name>'{}'</name></types>' > changed-sources/package/package.xml
                 echo '<version>59.0</version>' >> changed-sources/package/package.xml
 
 
