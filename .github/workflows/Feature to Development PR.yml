@@ -56,7 +56,9 @@ jobs:
                   echo y | sfdx plugins:install sfdx-git-delta
                   sfdx plugins 
 
-
+            - name: Debug SFDX_DEPLOYMENT_TYPE_SIT
+              run: | 
+                    echo "SFDX_DEPLOYMENT_TYPE_SIT: ${{ secrets.SFDX_DEPLOYMENT_TYPE_SIT }}"
 
             # Populate auth file with SFDX_URL secret of deployment destination.
             - name: 'Populate auth file with SFDX_URL secret of ST deployment destination'
