@@ -111,7 +111,10 @@ jobs:
                 echo '<version>59.0</version>' >> changed-sources/package/package.xml
 
                 sfdx sgd:source:delta --to HEAD --from HEAD^ --output delta-temp/ --generate-delta --source force-app/
-                
+
+                # Debug: Print the contents of delta-temp/ before moving
+                ls -R delta-temp/
+
                 mv delta-temp/force-app/main/default/destructiveChanges/* changed-sources/destructiveChanges/
                 
                 # Remove the temporary folder
