@@ -78,7 +78,12 @@ jobs:
               run: |
                   echo ${{ secrets.SFDX_AUTH_URL_PROD}} > ./SFDX_AUTH_URL.txt
                   export SFDX_DEPLOYMENT_TYPE=${{ env.SFDX_DEPLOYMENT_TYPE_PROD }}
-                  
+
+
+            - name: Debug SFDX_DEPLOYMENT_TYPE_SIT
+              run: 
+                  echo "SFDX_DEPLOYMENT_TYPE_SIT: ${{ env.SFDX_DEPLOYMENT_TYPE_SIT }}"
+  
             # Authenticate to org using the URL stored in the text file
             - name: 'Authenticate to deployment org'
               run: sfdx auth:sfdxurl:store -f ./SFDX_AUTH_URL.txt -s -a deployment
