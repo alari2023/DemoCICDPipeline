@@ -115,10 +115,11 @@ jobs:
                 # Debug: Print the contents of delta-temp/ before moving
                 ls -R delta-temp/
 
-                mv delta-temp/force-app/main/default/destructiveChanges/* changed-sources/destructiveChanges/
-                
+                # Move destructive changes to changed-sources/destructiveChanges
+                mv delta-temp/destructiveChanges/* changed-sources/destructiveChanges/
+
                 # Remove the temporary folder
-                rm -rf delta-temp
+                rm -rf delta-tempmp
     
             - name: 'Debug full package deployment'
               run: |
