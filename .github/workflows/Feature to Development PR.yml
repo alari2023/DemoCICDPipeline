@@ -23,7 +23,7 @@ jobs:
         if: ${{ github.actor != 'dependabot[bot]' }}
 
         env:
-          SFDX_DEPLOYMENT_TYPE_SIT: 'DELTA'  # Define SFDX_DEPLOYMENT_TYPE_SIT here
+          SFDX_DEPLOYMENT_TYPE: 'DELTA'  # Define SFDX_DEPLOYMENT_TYPE_SIT here
         steps:
             # Now we install nodejs in the VM, and specify version 14
             - uses: actions/setup-node@v3
