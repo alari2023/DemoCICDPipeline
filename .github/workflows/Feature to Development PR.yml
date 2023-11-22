@@ -58,7 +58,7 @@ jobs:
 
             - name: Debug SFDX_DEPLOYMENT_TYPE_SIT
               run: | 
-                    echo "SFDX_DEPLOYMENT_TYPE_SIT: ${{ secrets.SFDX_DEPLOYMENT_TYPE_SIT }}"
+                    echo "SFDX_DEPLOYMENT_TYPE_SIT: ${{ vars.SFDX_DEPLOYMENT_TYPE_SIT }}"
 
             # Populate auth file with SFDX_URL secret of deployment destination.
             - name: 'Populate auth file with SFDX_URL secret of ST deployment destination'
@@ -66,7 +66,7 @@ jobs:
               if: ${{ github.event.pull_request.base.ref == 'develop' }}
               run: |
                   echo ${{ secrets.SFDX_AUTH_URL_ST}} > ./SFDX_AUTH_URL.txt
-                  echo "SFDX_DEPLOYMENT_TYPE=${{ secrets.SFDX_DEPLOYMENT_TYPE_SIT }}" >> $GITHUB_ENV
+                  echo "SFDX_DEPLOYMENT_TYPE=${{ vars.SFDX_DEPLOYMENT_TYPE_SIT }}" >> $GITHUB_ENV
             
             # Populate auth file with SFDX_URL secret of release destination.
             - name: 'Populate auth file with SFDX_URL secret of release deployment destination'
