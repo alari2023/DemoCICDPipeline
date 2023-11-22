@@ -102,6 +102,10 @@ jobs:
                 mkdir -p changed-sources
                 mkdir -p changed-sources/package
                 cp -R force-app/ changed-sources/
+
+                # Identify and copy destructive changes using Salesforce DX Git Delta
+                sfdx sgd:source:delta --to HEAD --from HEAD^ --output changed-sources/ --generate-delta --source force-app/ --destructive-output changed-sources/destructiveChanges/
+    
                 find force-app/main/default/ -name "*.xml" -type f -exec dirname {} \; | sort -u | xargs -I {} echo '<types><members>*</members><name>'{}'</name></types>' > changed-sources/package/package.xml
                 echo '<version>59.0</version>' >> changed-sources/package/package.xml
 
