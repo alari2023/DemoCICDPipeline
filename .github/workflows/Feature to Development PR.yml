@@ -99,15 +99,10 @@ jobs:
             - name: 'Create full package for entire branch deployment'
               if: ${{ env.SFDX_DEPLOYMENT_TYPE == 'FULL' }}
               run: | 
-                mkdir -p changed-sources/package
-                echo '<?xml version="1.0" encoding="UTF-8"?><Package xmlns="http://soap.sforce.com/2006/04/metadata">' > changed-sources/package/package.xml
-                echo '    <types>' >> changed-sources/package/package.xml
-                echo '        <members>*</members>' >> changed-sources/package/package.xml
-                echo '        <name>*</name>' >> changed-sources/package/package.xml
-                echo '    </types>' >> changed-sources/package/package.xml
-                echo '    <version>53.0</version>' >> changed-sources/package/package.xml
-                echo '</Package>' >> changed-sources/package/package.xml
-                sfdx force:source:retrieve -x changed-sources/package/package.xml -u deployment 
+                mkdir -p changed-sources
+                sfdx force:source:retrieve -p force-app/ -u deployment
+                find force-app/ -name "*.xml" -type f -exec dirname {} \; | sort -u | xargs -I {} echo '<types><members>*</members><name>'{}'</name></types>' > changed-sources/package.xml
+                echo '<version>53.0</version>' >> changed-sources/package.xml
 
 
             # Uploads a package.xml file of all the components that SFDX git delta has identified as created or modified 
