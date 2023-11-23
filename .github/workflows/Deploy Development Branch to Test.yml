@@ -112,7 +112,7 @@ jobs:
                 mv delta-temp/destructiveChanges/* changed-sources/destructiveChanges/
 
                 # Remove the temporary folder
-                rm -rf delta-tempmp
+                rm -rf delta-temp
     
             - name: 'Debug full package deployment'
               run: |
