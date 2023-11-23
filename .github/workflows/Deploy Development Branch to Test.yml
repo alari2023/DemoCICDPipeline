@@ -85,9 +85,9 @@ jobs:
             - name: 'Create delta packages for new, modified or deleted metadata'
               if: ${{ env.SFDX_DEPLOYMENT_TYPE == 'DELTA' }}
               run: | 
-                  mkdir changed-sources
-                  sfdx sgd:source:delta --to "HEAD" --from "HEAD^" --output changed-sources/ --generate-delta --source force-app/
-                  
+                mkdir changed-sources
+                sfdx sgd:source:delta --to "HEAD" --from "HEAD^" --output changed-sources/ --generate-delta --source force-app/
+            
             # Create full package for entire branch deployment
             - name: 'Create full package for entire branch deployment'
               if: ${{ env.SFDX_DEPLOYMENT_TYPE == 'FULL' }}
@@ -96,28 +96,27 @@ jobs:
                 mkdir -p changed-sources/package
                 mkdir -p changed-sources/destructiveChanges
                 mkdir -p delta-temp
-                 
+            
                 cp -R force-app/ changed-sources/
-
-    
+            
                 find force-app/main/default/ -name "*.xml" -type f -exec dirname {} \; | sort -u | xargs -I {} echo '<types><members>*</members><name>'{}'</name></types>' > changed-sources/package/package.xml
                 echo '<version>59.0</version>' >> changed-sources/package/package.xml
-
+            
                 sfdx sgd:source:delta --to HEAD --from HEAD^ --output delta-temp/ --generate-delta --source force-app/
-
+            
                 # Debug: Print the contents of delta-temp/ before moving
                 ls -R delta-temp/
-
+            
                 # Move destructive changes to changed-sources/destructiveChanges
                 mv delta-temp/destructiveChanges/* changed-sources/destructiveChanges/
-
+            
                 # Remove the temporary folder
                 rm -rf delta-temp
-    
+            
             - name: 'Debug full package deployment'
               run: |
                 ls -R changed-sources
-                ls -R changed-sources/force-app           
+                ls -R changed-sources/force-app          
 
 
             # Uploads a package.xml file of all the components that SFDX git delta has identified as created or modified 
@@ -144,12 +143,12 @@ jobs:
               
             # Performs a delta deployment to the destination org 
             - name: 'Deploy the changes in branch to deployment destination'
-              run: 
+              run: |
                 if [ -n "$(ls -A changed-sources)" ]; then
-                    sfdx force:source:deploy -p "changed-sources/force-app"  --testlevel RunLocalTests --json
+                  sfdx force:source:deploy -p "changed-sources/force-app" --testlevel RunLocalTests --json
                 else
-                    echo "No changes in the 'changed-sources' directory. Skipping deployment."
-                fi   
+                  echo "No changes in the 'changed-sources' directory. Skipping deployment."
+                fi
               
             # Performs a destructive deployment to the destination org
             - name: 'Deploy destructive changes (if any) to deployment destination'
