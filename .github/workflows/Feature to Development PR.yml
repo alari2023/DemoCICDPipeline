@@ -215,13 +215,10 @@ jobs:
             - name: 'Check-only deploy destructive changes'
               id: CheckDestructiveDeploy
               run: |
-                result=$(sfdx force:mdapi:deploy -d "changed-sources/destructiveChanges" --checkonly --ignorewarnings --json)
-                echo "Deployment Result: $result"
-                status=$(echo $result | jq -r '.status')
-                echo "Status: $status"
-                if [ "$status" != "0" ]; then
-                  echo "Destructive changes deployment failed."
-                  exit 1
+                if [ -n "$(ls -A changed-sources/destructiveChanges)" ]; then
+                  sfdx force:source:deploy -d "changed-sources/destructiveChanges" --checkonly --json
+                else
+                  echo "No changes in the 'changed-sources/destructiveChanges' directory. Skipping deployment."
                 fi
 
 
