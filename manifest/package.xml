@@ -42,5 +42,9 @@
 		<members>Opportunity.TrackingNumber__c</members>
 		<name>CustomField</name>
 	</types>
-	<version>55.0</version>
+	<types>
+		<members>*</members>
+		<name>Flow</name>
+	</types>
+	<version>58.0</version>
 </Package>
