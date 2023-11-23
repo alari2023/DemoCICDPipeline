@@ -216,12 +216,14 @@ jobs:
               id: CheckDestructiveDeploy
               run: |
                 result=$(sfdx force:mdapi:deploy -d "changed-sources/destructiveChanges" --checkonly --ignorewarnings --json)
+                echo "Deployment Result: $result"
                 status=$(echo $result | jq -r '.status')
                 echo "Status: $status"
                 if [ "$status" != "0" ]; then
                   echo "Destructive changes deployment failed."
                   exit 1
                 fi
+
 
             # Writes a comment to the pull request if the check only destructive deployment failed
             - name: 'Test destructive deployment failed'
