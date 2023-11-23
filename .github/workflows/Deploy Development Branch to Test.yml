@@ -14,7 +14,8 @@ jobs:
     deploy-branch-to-Org:
         runs-on: ubuntu-latest
         if: ${{ github.actor != 'dependabot[bot]' }}
-
+        env:
+          SFDX_DEPLOYMENT_TYPE: ''
         steps:
             # Install Salesforce CLI
             - name: 'Install Salesforce CLI'
