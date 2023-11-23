@@ -212,15 +212,15 @@ jobs:
                     body: 'Salesforce deployment failed - check workflow logs'
                     })
                   
-            # Performs a check only destructive deployment to validate that any destructive changes can be made   
             - name: 'Check-only deploy destructive changes'
-              id :  CheckDestructiveDeploy 
+              id: CheckDestructiveDeploy
               run: |
                 result=$(sfdx force:mdapi:deploy -d "changed-sources/destructiveChanges" --checkonly --ignorewarnings --json)
                 status=$(echo $result | jq -r '.status')
+                echo "Status: $status"
                 if [ "$status" != "0" ]; then
-                    echo "Destructive changes deployment failed."
-                exit 1
+                  echo "Destructive changes deployment failed."
+                  exit 1
                 fi
 
             # Writes a comment to the pull request if the check only destructive deployment failed
