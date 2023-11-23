@@ -18,6 +18,7 @@
 	</types>
 	<types>
 		<members>Account.Active__c</members>
+		<members>Account.Another_field__c</members>
 		<members>Account.CustomerPriority__c</members>
 		<members>Account.NumberofLocations__c</members>
 		<members>Account.SLAExpirationDate__c</members>
