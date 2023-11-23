@@ -215,11 +215,28 @@ jobs:
             - name: 'Check-only deploy destructive changes'
               id: CheckDestructiveDeploy
               run: |
-                if [ -n "$(ls -A changed-sources/destructiveChanges)" ]; then
-                  sfdx force:source:deploy -d "changed-sources/destructiveChanges" --checkonly --json
-                else
-                  echo "No changes in the 'changed-sources/destructiveChanges' directory. Skipping deployment."
-                fi
+                result=$(sfdx force:mdapi:deploy -d "changed-sources/destructiveChanges" --checkonly --json)
+                deploymentId=$(echo $result | jq -r '.result.id')
+                
+                while true; do
+                  statusResult=$(sfdx force:mdapi:deploy:report -i "$deploymentId" --json)
+                  status=$(echo $statusResult | jq -r '.result.status')
+                  
+                  case $status in
+                    "Queued"|"InProgress")
+                      echo "Deployment is still in progress. Waiting..."
+                      sleep 10
+                      ;;
+                    "Succeeded")
+                      echo "Destructive changes deployment succeeded."
+                      break
+                      ;;
+                    *)
+                      echo "Destructive changes deployment failed."
+                      exit 1
+                      ;;
+                  esac
+                done
 
 
             # Writes a comment to the pull request if the check only destructive deployment failed
