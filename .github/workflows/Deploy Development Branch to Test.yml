@@ -14,6 +14,8 @@ jobs:
     deploy-branch-to-Org:
         runs-on: ubuntu-latest
         if: ${{ github.actor != 'dependabot[bot]' }}
+        env:
+          SFDX_DEPLOYMENT_TYPE: ''
         steps:
             # Install Salesforce CLI
             - name: 'Install Salesforce CLI'
@@ -59,7 +61,7 @@ jobs:
               if: ${{ steps.extract_branch.outputs.branch == 'develop' }}
               run: |
                   echo ${{ secrets.SFDX_AUTH_URL_ST}} > ./SFDX_AUTH_URL.txt
-                  export SFDX_DEPLOYMENT_TYPE=${{ env.SFDX_DEPLOYMENT_TYPE_SIT }}
+                  echo "SFDX_DEPLOYMENT_TYPE=${{ vars.SFDX_DEPLOYMENT_TYPE_SIT }}" >> $GITHUB_ENV
             
             # Populate auth file with SFDX_URL secret of release destination.
             - name: 'Populate auth file with SFDX_URL secret of release deployment destination'
@@ -67,7 +69,7 @@ jobs:
               if: ${{ contains(steps.extract_branch.outputs.branch,'release/') }}
               run: |
                   echo ${{ secrets.SFDX_AUTH_URL_UAT}} > ./SFDX_AUTH_URL.txt
-                  export SFDX_DEPLOYMENT_TYPE=${{ env.SFDX_DEPLOYMENT_TYPE_UAT }}
+                  echo "SFDX_DEPLOYMENT_TYPE=${{ vars.SFDX_DEPLOYMENT_TYPE_UAT }}" >> $GITHUB_ENV
             
             # Populate auth file with SFDX_URL secret of prod destination.
             - name: 'Populate auth file with SFDX_URL secret of production deployment destination'
@@ -75,7 +77,7 @@ jobs:
               if: ${{ steps.extract_branch.outputs.branch == 'master' }}
               run: |
                   echo ${{ secrets.SFDX_AUTH_URL_PROD}} > ./SFDX_AUTH_URL.txt
-                  export SFDX_DEPLOYMENT_TYPE=${{ env.SFDX_DEPLOYMENT_TYPE_PROD }}
+                  echo "SFDX_DEPLOYMENT_TYPE=${{ vars.SFDX_DEPLOYMENT_TYPE_PROD }}" >> $GITHUB_ENV
             
             # We use SFDX Git Delta to create a directory with only the metadata that has changed.
             # this allows us to deploy only those changes, as opposed to deploying the entire branch. 
@@ -90,8 +92,32 @@ jobs:
             - name: 'Create full package for entire branch deployment'
               if: ${{ env.SFDX_DEPLOYMENT_TYPE == 'FULL' }}
               run: | 
-                    mkdir changed-sources
-                    cp -R force-app/ changed-sources/                
+                mkdir -p changed-sources
+                mkdir -p changed-sources/package
+                mkdir -p changed-sources/destructiveChanges
+                mkdir -p delta-temp
+                 
+                cp -R force-app/ changed-sources/
+
+    
+                find force-app/main/default/ -name "*.xml" -type f -exec dirname {} \; | sort -u | xargs -I {} echo '<types><members>*</members><name>'{}'</name></types>' > changed-sources/package/package.xml
+                echo '<version>59.0</version>' >> changed-sources/package/package.xml
+
+                sfdx sgd:source:delta --to HEAD --from HEAD^ --output delta-temp/ --generate-delta --source force-app/
+
+                # Debug: Print the contents of delta-temp/ before moving
+                ls -R delta-temp/
+
+                # Move destructive changes to changed-sources/destructiveChanges
+                mv delta-temp/destructiveChanges/* changed-sources/destructiveChanges/
+
+                # Remove the temporary folder
+                rm -rf delta-tempmp
+    
+            - name: 'Debug full package deployment'
+              run: |
+                ls -R changed-sources
+                ls -R changed-sources/force-app           
 
 
             # Uploads a package.xml file of all the components that SFDX git delta has identified as created or modified 
