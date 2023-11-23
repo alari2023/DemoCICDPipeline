@@ -14,8 +14,7 @@ jobs:
     deploy-branch-to-Org:
         runs-on: ubuntu-latest
         if: ${{ github.actor != 'dependabot[bot]' }}
-        env:
-          SFDX_DEPLOYMENT_TYPE: ''
+
         steps:
             # Install Salesforce CLI
             - name: 'Install Salesforce CLI'
@@ -83,7 +82,7 @@ jobs:
             # this allows us to deploy only those changes, as opposed to deploying the entire branch. 
             # This helps reducing deployment times          
             - name: 'Create delta packages for new, modified or deleted metadata'
-            if: ${{ env.SFDX_DEPLOYMENT_TYPE == 'DELTA' }}
+              if: ${{ env.SFDX_DEPLOYMENT_TYPE == 'DELTA' }}
               run: | 
                   mkdir changed-sources
                   sfdx sgd:source:delta --to "HEAD" --from "HEAD^" --output changed-sources/ --generate-delta --source force-app/
