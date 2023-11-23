@@ -143,12 +143,12 @@ jobs:
               
             # Performs a delta deployment to the destination org 
             - name: 'Deploy the changes in branch to deployment destination'
-              run: 
+              run: |
                 if [ -n "$(ls -A changed-sources)" ]; then
-                    sfdx force:source:deploy -p "changed-sources/force-app"  --testlevel RunLocalTests --json
+                  sfdx force:source:deploy -p "changed-sources/force-app" --testlevel RunLocalTests --json
                 else
-                    echo "No changes in the 'changed-sources' directory. Skipping deployment."
-                fi   
+                  echo "No changes in the 'changed-sources' directory. Skipping deployment."
+                fi
               
             # Performs a destructive deployment to the destination org
             - name: 'Deploy destructive changes (if any) to deployment destination'
