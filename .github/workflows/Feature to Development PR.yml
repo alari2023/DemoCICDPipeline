@@ -188,7 +188,7 @@ jobs:
             - name: 'Check-only deploy'
               id : checkDeploy
               run: |
-                if [ -n "$(ls -A changed-sources)" ]; then
+                if [ -d "changed-sources/force-app" ] && [ -n "$(ls -A changed-sources/force-app)" ]; then
                   sfdx force:source:deploy -p "changed-sources/force-app" --checkonly --testlevel RunLocalTests  --json
                 else
                     echo "No changes in the 'changed-sources' directory. Skipping deployment."
