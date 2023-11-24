@@ -121,11 +121,6 @@ jobs:
                 # Remove the temporary folder
                 rm -rf delta-tempmp
     
-            - name: 'Debug full package deployment'
-              run: |
-                ls -R changed-sources
-                ls -R changed-sources/force-app
-
 
             # Uploads a package.xml file of all the components that SFDX git delta has identified as created or modified 
             - name: 'Upload change sources file'
@@ -193,7 +188,7 @@ jobs:
             - name: 'Check-only deploy'
               id : checkDeploy
               run: |
-                if [ -n "$(ls -A changed-sources)" ]; then
+                if [ -d "changed-sources/force-app" ] && [ -n "$(ls -A changed-sources/force-app)" ]; then
                   sfdx force:source:deploy -p "changed-sources/force-app" --checkonly --testlevel RunLocalTests  --json
                 else
                     echo "No changes in the 'changed-sources' directory. Skipping deployment."
@@ -212,16 +207,31 @@ jobs:
                     body: 'Salesforce deployment failed - check workflow logs'
                     })
                   
-            # Performs a check only destructive deployment to validate that any destructive changes can be made   
-            - name: 'Check-only deploy destructive changes'
-              id :  CheckDestructiveDeploy 
+            - name: 'Check-only deploy for destructive changes'
+              id: checkDestructiveDeploy
               run: |
-                result=$(sfdx force:mdapi:deploy -d "changed-sources/destructiveChanges" --checkonly --ignorewarnings --json)
-                status=$(echo $result | jq -r '.status')
-                if [ "$status" != "0" ]; then
+                # Trigger the check-only deployment
+                result=$(sfdx force:mdapi:deploy -d "changed-sources/destructiveChanges" --checkonly --json)
+                
+                # Extract deployment ID
+                deployId=$(echo $result | jq -r '.result.id')
+                echo "Deployment ID: $deployId"
+                
+                # Check deployment status in a loop
+                status="Queued"
+                while [ "$status" == "Queued" ] || [ "$status" == "InProgress" ]; do
+                    sleep 10
+                    deploymentStatus=$(sfdx force:mdapi:deploy:report -i $deployId --json)
+                    status=$(echo $deploymentStatus | jq -r '.result.status')
+                    echo "Deployment Status: $status"
+                done
+            
+                # Check if deployment was successful
+                if [ "$status" != "Succeeded" ]; then
                     echo "Destructive changes deployment failed."
-                exit 1
+                    exit 1
                 fi
+
 
             # Writes a comment to the pull request if the check only destructive deployment failed
             - name: 'Test destructive deployment failed'
