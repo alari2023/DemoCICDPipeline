@@ -184,7 +184,8 @@ jobs:
                     repo: context.repo.repo,
                     body: 'No Apex class changes identified - PMD not run'
                     })
-            # Performs a check only delta deployment to validate the components can be deployed to the destination org      
+                    
+            # Performs a check only deployment to validate the components can be deployed to the destination org      
             - name: 'Check-only deploy'
               id : checkDeploy
               run: |
@@ -206,7 +207,8 @@ jobs:
                     repo: context.repo.repo,
                     body: 'Salesforce deployment failed - check workflow logs'
                     })
-                  
+                    
+            # Performs a check only destructivedeployment to validate the components can be deleted from the destination org 
             - name: 'Check-only deploy for destructive changes'
               id: checkDestructiveDeploy
               run: |
