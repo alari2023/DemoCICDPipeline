@@ -24,13 +24,21 @@
 		<members>Account.SLAExpirationDate__c</members>
 		<members>Account.SLASerialNumber__c</members>
 		<members>Account.SLA__c</members>
+		<members>Account.Test_Deploy_field__c</members>
+		<members>Account.Test_Update_Field__c</members>
 		<members>Account.UpsellOpportunity__c</members>
+		<members>Account.test_field_again__c</members>
 		<members>Case.EngineeringReqNumber__c</members>
 		<members>Case.PotentialLiability__c</members>
 		<members>Case.Product__c</members>
 		<members>Case.SLAViolation__c</members>
+		<members>Case.TestFieldForceFail__c</members>
+		<members>Contact.Contract_extra_field_one__c</members>
+		<members>Contact.Date_Field_Test__c</members>
 		<members>Contact.Languages__c</members>
 		<members>Contact.Level__c</members>
+		<members>Customer.How_good__c</members>
+		<members>Goal.OrigGoalId__c</members>
 		<members>Lead.CurrentGenerators__c</members>
 		<members>Lead.NumberofLocations__c</members>
 		<members>Lead.Primary__c</members>
