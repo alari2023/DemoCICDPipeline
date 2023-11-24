@@ -111,13 +111,7 @@ jobs:
 
                 # Remove the temporary folder
                 rm -rf delta-temp
-    
-            - name: 'Debug full package deployment'
-              run: |
-                ls -R changed-sources
-                ls -R changed-sources/force-app           
-
-
+            
             # Uploads a package.xml file of all the components that SFDX git delta has identified as created or modified 
             - name: 'Upload change sources file'
               if: success() || failure()
