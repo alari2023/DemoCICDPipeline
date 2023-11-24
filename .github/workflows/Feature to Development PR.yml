@@ -212,34 +212,30 @@ jobs:
                     body: 'Salesforce deployment failed - check workflow logs'
                     })
                   
-            # Performs a check-only deployment for destructive changes
             - name: 'Check-only deploy for destructive changes'
               id: checkDestructiveDeploy
               run: |
+                # Trigger the check-only deployment
                 result=$(sfdx force:mdapi:deploy -d "changed-sources/destructiveChanges" --checkonly --json)
-                deploymentId=$(echo $result | jq -r '.result.id')
                 
-                while true; do
-                  statusResult=$(sfdx force:mdapi:deploy:report -i "$deploymentId" --json)
-                  status=$(echo $statusResult | jq -r '.result.status')
-                  
-                  echo "Deployment Status: $status"
-                  
-                  case $status in
-                    "Queued"|"InProgress")
-                      echo "Deployment is still in progress. Waiting..."
-                      sleep 10
-                      ;;
-                    "Succeeded")
-                      echo "Destructive changes deployment succeeded."
-                      break
-                      ;;
-                    *)
-                      echo "Destructive changes deployment failed."
-                      exit 1
-                      ;;
-                  esac
+                # Extract deployment ID
+                deployId=$(echo $result | jq -r '.result.id')
+                echo "Deployment ID: $deployId"
+                
+                # Check deployment status in a loop
+                status="Queued"
+                while [ "$status" == "Queued" ] || [ "$status" == "InProgress" ]; do
+                    sleep 10
+                    deploymentStatus=$(sfdx force:mdapi:deploy:report -i $deployId --json)
+                    status=$(echo $deploymentStatus | jq -r '.result.status')
+                    echo "Deployment Status: $status"
                 done
+            
+                # Check if deployment was successful
+                if [ "$status" != "Succeeded" ]; then
+                    echo "Destructive changes deployment failed."
+                    exit 1
+                fi
 
 
             # Writes a comment to the pull request if the check only destructive deployment failed
