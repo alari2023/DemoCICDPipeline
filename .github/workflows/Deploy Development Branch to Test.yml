@@ -136,7 +136,7 @@ jobs:
               
             # Performs a create/update deployment to the destination org 
             - name: 'Deploy the changes in branch to deployment destination'
-              run: 
+              run: |
                 if [ -d "changed-sources/force-app" ] && [ -n "$(ls -A changed-sources/force-app)" ]; then
                     sfdx force:source:deploy -p "changed-sources/force-app"  --testlevel RunLocalTests --json
                 else
