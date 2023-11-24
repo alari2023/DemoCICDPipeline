@@ -112,9 +112,6 @@ jobs:
 
                 sfdx sgd:source:delta --to HEAD --from HEAD^ --output delta-temp/ --generate-delta --source force-app/
 
-                # Debug: Print the contents of delta-temp/ before moving
-                ls -R delta-temp/
-
                 # Move destructive changes to changed-sources/destructiveChanges
                 mv delta-temp/destructiveChanges/* changed-sources/destructiveChanges/
 
