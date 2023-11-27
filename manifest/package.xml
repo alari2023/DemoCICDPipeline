@@ -11,8 +11,6 @@
 	<types>
 		<members>AccountTriggerHandler</members>
 		<members>AccountTriggerHandlerTest</members>
-		<members>TrailshredController</members>
-		<members>TrailshredControllerTest</members>
 		<name>ApexClass</name>
 	</types>
 	<types>
