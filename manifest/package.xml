@@ -9,7 +9,10 @@
 		<name>AnimationRule</name>
 	</types>
 	<types>
-		<members>*</members>
+		<members>AccountTriggerHandler</members>
+		<members>AccountTriggerHandlerTest</members>
+		<members>TrailshredController</members>
+		<members>TrailshredControllerTest</members>
 		<name>ApexClass</name>
 	</types>
 	<types>
@@ -90,6 +93,10 @@
 	</types>
 	<types>
 		<members>*</members>
+		<name>CompactLayout</name>
+	</types>
+	<types>
+		<members>*</members>
 		<name>ConnectedApp</name>
 	</types>
 	<types>
@@ -144,11 +151,17 @@
 		<members>Lead.Primary__c</members>
 		<members>Lead.ProductInterest__c</members>
 		<members>Lead.SICCode__c</members>
+		<members>Metric.OrigMetricId__c</members>
 		<members>Opportunity.CurrentGenerators__c</members>
 		<members>Opportunity.DeliveryInstallationStatus__c</members>
 		<members>Opportunity.MainCompetitors__c</members>
 		<members>Opportunity.OrderNumber__c</members>
 		<members>Opportunity.TrackingNumber__c</members>
+		<members>Trailshred_Setting__mdt.Active__c</members>
+		<members>Trailshred_Setting__mdt.Audio_Static_Resource_Path__c</members>
+		<members>Trailshred_Setting__mdt.Field_Name__c</members>
+		<members>Trailshred_Setting__mdt.Field_Value__c</members>
+		<members>Trailshred_Setting__mdt.Object_Name__c</members>
 		<name>CustomField</name>
 	</types>
 	<types>
