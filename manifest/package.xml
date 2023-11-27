@@ -47,10 +47,6 @@
 	</types>
 	<types>
 		<members>*</members>
-		<name>AssignmentRules</name>
-	</types>
-	<types>
-		<members>*</members>
 		<name>AuraDefinitionBundle</name>
 	</types>
 	<types>
@@ -76,10 +72,6 @@
 	<types>
 		<members>*</members>
 		<name>ChatterExtension</name>
-	</types>
-	<types>
-		<members>*</members>
-		<name>CleanDataService</name>
 	</types>
 	<types>
 		<members>*</members>
@@ -444,15 +436,7 @@
 	</types>
 	<types>
 		<members>*</members>
-		<name>EntitlementProcess</name>
-	</types>
-	<types>
-		<members>*</members>
 		<name>EntitlementTemplate</name>
-	</types>
-	<types>
-		<members>Case</members>
-		<name>EscalationRules</name>
 	</types>
 	<types>
 		<members>*</members>
@@ -797,15 +781,7 @@
 	</types>
 	<types>
 		<members>*</members>
-		<name>SamlSsoConfig</name>
-	</types>
-	<types>
-		<members>*</members>
 		<name>Scontrol</name>
-	</types>
-	<types>
-		<members>*</members>
-		<name>Settings</name>
 	</types>
 	<types>
 		<members>*</members>
