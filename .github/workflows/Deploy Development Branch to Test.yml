@@ -35,7 +35,7 @@ jobs:
 
             # Checkout the source code
             - name: 'Checkout source code'
-              uses: actions/checkout@v3
+              uses: actions/checkout@v5
               with:
                 token: ${{ secrets.ACCESS_TOKEN }}
                 fetch-depth: 0
@@ -57,9 +57,9 @@ jobs:
 
 
             # Populate auth file with SFDX_URL secret of test destination.
-            - name: 'Populate auth file with SFDX_URL secret of release deployment destination'
+            - name: 'Populate auth file with SFDX_URL secret of test deployment destination'
               shell: bash            
-              if: startsWith(steps.extract_branch.outputs.branch, 'sprint/')
+              if: ${{ contains(steps.extract_branch.outputs.branch,'sprint/') }}
               run: |
                   echo ${{ secrets.SFDX_AUTH_URL_TEST}} > ./SFDX_AUTH_URL.txt
                   echo "SFDX_DEPLOYMENT_TYPE=${{ vars.SFDX_DEPLOYMENT_TYPE_TEST }}" >> $GITHUB_ENV
