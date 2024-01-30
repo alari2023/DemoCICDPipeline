@@ -55,6 +55,14 @@ jobs:
                     echo "branch=INVALID_EVENT_BRANCH_UNKNOWN" >> $GITHUB_OUTPUT
                 fi
 
+
+            # Populate auth file with SFDX_URL secret of test destination.
+            - name: 'Populate auth file with SFDX_URL secret of release deployment destination'
+              shell: bash            
+              if: ${{ contains(steps.extract_branch.outputs.branch,'sprint/') }}
+              run: |
+                  echo ${{ secrets.SFDX_AUTH_URL_TEST}} > ./SFDX_AUTH_URL.txt
+                  echo "SFDX_DEPLOYMENT_TYPE=${{ vars.SFDX_DEPLOYMENT_TYPE_TEST }}" >> $GITHUB_ENV
                
             # Populate auth file with SFDX_URL secret of deployment destination.
             - name: 'Populate auth file with SFDX_URL secret of ST deployment destination'
@@ -146,7 +154,7 @@ jobs:
             # Performs a destructive deployment to the destination org
             - name: 'Deploy destructive changes (if any) to deployment destination'
               run: |
-                # Trigger the check-only deployment
+                # Trigger the deployment
                 result=$(sfdx force:mdapi:deploy -d "changed-sources/destructiveChanges" --json)
                 
                 # Extract deployment ID
