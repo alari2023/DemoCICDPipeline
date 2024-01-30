@@ -25,10 +25,10 @@ jobs:
         env:
           SFDX_DEPLOYMENT_TYPE: ''  
         steps:
-            # Now we install nodejs in the VM, and specify version 20
-            - uses: actions/setup-node@v5
+            # Now we install nodejs in the VM, and specify version 14
+            - uses: actions/setup-node@v3
               with:
-                node-version: '20'
+                node-version: '14'
 
             - name: 'Checkout source code'
               uses: actions/checkout@v3
