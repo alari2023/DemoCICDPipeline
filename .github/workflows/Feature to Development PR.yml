@@ -58,7 +58,7 @@ jobs:
             # Populate auth file with SFDX_URL secret of deployment destination.
             - name: 'Populate auth file with SFDX_URL secret of ST deployment destination'
               shell: bash
-              if: ${{ contains(github.event.pull_request.base.ref,'sprint/') }}
+              if: startsWith(github.event.pull_request.base.ref, 'sprint/')
               run: |
                   echo ${{ secrets.SFDX_AUTH_URL_TEST}} > ./SFDX_AUTH_URL.txt
                   echo "SFDX_DEPLOYMENT_TYPE=${{ vars.SFDX_DEPLOYMENT_TYPE_TEST }}" >> $GITHUB_ENV
