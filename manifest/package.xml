@@ -3,6 +3,7 @@
 	<types>
 		<members>Account.field_1__c</members>
 		<members>Account.field_2__c</members>
+		<members>Account.field_3__c</members>
 		<name>CustomField</name>
 	</types>
 	<version>59.0</version>
