@@ -1,41 +1,23 @@
 # Unique name for this workflow
-name: Validation pipeline
+name: Deployment Pipeline
 
 # Definition when the workflow should run
 on:
-    # The workflow will run whenever an event happens on a pull request
-    pull_request:
-      types: [opened, synchronize]
-    
-      branches: [develop, release/** ,master ]
-    
+    push:
+      branches: [ develop, release/** ,master ]
       paths:
         - 'force-app/**'
-## Allows the workflow to write to the pull request            
-permissions: 
-    pull-requests: write
-    
-# Jobs to be executed when the above conditions are met
+            
+
+# Jobs to be executed
 jobs:
-    # This is the name of the job. You can give it whatever name you want
-    validate-deployment:
+    deploy-branch-to-Org:
         runs-on: ubuntu-latest
         if: ${{ github.actor != 'dependabot[bot]' }}
-        
-        env:
-          SFDX_DEPLOYMENT_TYPE: ''  
-        steps:
-            # Now we install nodejs in the VM, and specify version 14
-            - uses: actions/setup-node@v3
-              with:
-                node-version: '14'
 
-            - name: 'Checkout source code'
-              uses: actions/checkout@v3
-              with:
-                token: ${{ secrets.ACCESS_TOKEN }}
-                fetch-depth: 0
-            
+        env:
+          SFDX_DEPLOYMENT_TYPE: ''
+        steps:
             # Install Salesforce CLI
             - name: 'Install Salesforce CLI'
               run: |
@@ -45,28 +27,47 @@ jobs:
                   echo "$HOME/sfdx/bin" >> $GITHUB_PATH
                   ~/sfdx/bin/sfdx version
 
-            # Then we install the SFDX-Git-Delta plugin - https://github.com/scolladon/sfdx-git-delta
-            # This is an awesome plugin that allows us to extract a package.xml with the metadata
-            # that has changed between commits. I highly recommend going over the github readme 
-            # for more information on how this works.
-
-            - name: 'Installing SFDX git delta'
+            # install SFDX-Git-Delta plugin - https://github.com/scolladon/sfdx-git-delta
+            - name: 'Installing sfdx git delta'
               run: | 
                   echo y | sfdx plugins:install sfdx-git-delta
                   sfdx plugins 
 
-            # Populate auth file with SFDX_URL secret of deployment destination.
-            - name: 'Populate auth file with SFDX_URL secret of ST deployment destination'
-              shell: bash
-              if: ${{ contains(github.event.pull_request.base.ref,'sprint/') }}
+            # Checkout the source code
+            - name: 'Checkout source code'
+              uses: actions/checkout@v3
+              with:
+                token: ${{ secrets.ACCESS_TOKEN }}
+                fetch-depth: 0
+                
+            # Gets the branch name that the deployment is running on - this drives which org is the destination org     
+            - name: Branch used
+              id: extract_branch
+              run: |
+                if [[ "${GITHUB_EVENT_NAME}" == "push" ]]; then
+                    #echo "::set-output name=branch::$(echo  ${GITHUB_REF#refs/heads/})"
+                    echo "branch=$(echo ${GITHUB_REF#refs/heads/})" >> $GITHUB_OUTPUT
+                elif [[ "${GITHUB_EVENT_NAME}" == "pull_request" ]]; then
+                    #echo "::set-output name=branch::$(echo $GITHUB_BASE_REF)"
+                    echo "branch=$(echo $GITHUB_BASE_REF)" >> $GITHUB_OUTPUT
+                else
+                    #echo "::set-output name=branch::INVALID_EVENT_BRANCH_UNKNOWN"
+                    echo "branch=INVALID_EVENT_BRANCH_UNKNOWN" >> $GITHUB_OUTPUT
+                fi
+
+
+            # Populate auth file with SFDX_URL secret of test destination.
+            - name: 'Populate auth file with SFDX_URL secret of release deployment destination'
+              shell: bash            
+              if: startsWith(steps.extract_branch.outputs.branch, 'sprint/')
               run: |
                   echo ${{ secrets.SFDX_AUTH_URL_TEST}} > ./SFDX_AUTH_URL.txt
                   echo "SFDX_DEPLOYMENT_TYPE=${{ vars.SFDX_DEPLOYMENT_TYPE_TEST }}" >> $GITHUB_ENV
-
+               
             # Populate auth file with SFDX_URL secret of deployment destination.
             - name: 'Populate auth file with SFDX_URL secret of ST deployment destination'
               shell: bash
-              if: ${{ github.event.pull_request.base.ref == 'develop' }}
+              if: ${{ steps.extract_branch.outputs.branch == 'develop' }}
               run: |
                   echo ${{ secrets.SFDX_AUTH_URL_ST}} > ./SFDX_AUTH_URL.txt
                   echo "SFDX_DEPLOYMENT_TYPE=${{ vars.SFDX_DEPLOYMENT_TYPE_SIT }}" >> $GITHUB_ENV
@@ -74,33 +75,28 @@ jobs:
             # Populate auth file with SFDX_URL secret of release destination.
             - name: 'Populate auth file with SFDX_URL secret of release deployment destination'
               shell: bash            
-              if: ${{ contains(github.event.pull_request.base.ref,'release/') }}
+              if: ${{ contains(steps.extract_branch.outputs.branch,'release/') }}
               run: |
                   echo ${{ secrets.SFDX_AUTH_URL_UAT}} > ./SFDX_AUTH_URL.txt
                   echo "SFDX_DEPLOYMENT_TYPE=${{ vars.SFDX_DEPLOYMENT_TYPE_UAT }}" >> $GITHUB_ENV
-                  
             
             # Populate auth file with SFDX_URL secret of prod destination.
             - name: 'Populate auth file with SFDX_URL secret of production deployment destination'
               shell: bash
-              if: ${{ github.event.pull_request.base.ref == 'master' }}
+              if: ${{ steps.extract_branch.outputs.branch == 'master' }}
               run: |
                   echo ${{ secrets.SFDX_AUTH_URL_PROD}} > ./SFDX_AUTH_URL.txt
                   echo "SFDX_DEPLOYMENT_TYPE=${{ vars.SFDX_DEPLOYMENT_TYPE_PROD }}" >> $GITHUB_ENV
-                  
-            # Authenticate to org using the URL stored in the text file
-            - name: 'Authenticate to deployment org'
-              run: sfdx auth:sfdxurl:store -f ./SFDX_AUTH_URL.txt -s -a deployment
-
+            
             # We use SFDX Git Delta to create a directory with only the metadata that has changed.
             # this allows us to deploy only those changes, as opposed to deploying the entire branch. 
-            # This helps reducing deployment times
+            # This helps reducing deployment times          
             - name: 'Create delta packages for new, modified or deleted metadata'
               if: ${{ env.SFDX_DEPLOYMENT_TYPE == 'DELTA' }}
               run: | 
                   mkdir changed-sources
                   sfdx sgd:source:delta --to "HEAD" --from "HEAD^" --output changed-sources/ --generate-delta --source force-app/
-
+                  
             # Create full package for entire branch deployment
             - name: 'Create full package for entire branch deployment'
               if: ${{ env.SFDX_DEPLOYMENT_TYPE == 'FULL' }}
@@ -122,9 +118,8 @@ jobs:
                 mv delta-temp/destructiveChanges/* changed-sources/destructiveChanges/
 
                 # Remove the temporary folder
-                rm -rf delta-tempmp
-    
-
+                rm -rf delta-temp
+            
             # Uploads a package.xml file of all the components that SFDX git delta has identified as created or modified 
             - name: 'Upload change sources file'
               if: success() || failure()
@@ -133,7 +128,7 @@ jobs:
                 name: Changed-Updated-Components
                 path: changed-sources/package/package.xml
                 if-no-files-found: warn # 'warn' or 'ignore' are also available, defaults to `warn`
-
+            
             # Uploads a package.xml file of all the components that SFDX git delta has identified as deleted
             - name: 'Upload destructive source file'
               if: success() || failure()
@@ -143,80 +138,24 @@ jobs:
                 path: changed-sources/destructiveChanges/destructiveChanges.xml
                 if-no-files-found: warn # 'warn' or 'ignore' are also available, defaults to `warn`
                 
-            # Set up the PMD tool
-            - name: 'Setup PMD'
-              uses: legetz/setup-pmd@7.0.0-rc3
-            
-            # Run the PMD code scan if there has been apex class changes           
-            - name: 'Apex changes scan'
-              id: Codescan
-              if: ${{ hashFiles('changed-sources/force-app/main/default/classes/*.cls') != '' }}
-              run: pmd check --dir changed-sources/force-app/main/default/classes/*.cls --rulesets ./pmd-rules.xml -f text -r ./pmdResults/PmdResults.sarif
-
-
-            # Uploads the PMD file if the PMD scan fails
-            - name: 'Upload PMD file'
-              if:  failure()
-              uses: actions/upload-artifact@v3
-              with:
-                name: Pmd-Scan-Report
-                path: ./pmdResults/PmdResults.sarif
-                if-no-files-found: warn # 'warn' or 'ignore' are also available, defaults to `warn`
-            
-            # Writes a comment to the pull request if the PMD scan failed    
-            - name: 'Apex code scan failed'
-              uses: actions/github-script@v6
-              if: failure() && steps.Codescan.outcome == 'failure'
-              with:
-                  script: |
-                    github.rest.issues.createComment({
-                    issue_number: context.issue.number,
-                    owner: context.repo.owner,
-                    repo: context.repo.repo,
-                    body: 'Apex classes failed PMD scan - check workflow logs'
-                    })
-            # Writes a comment to the pull request to inform that there was no Apex code scan run
-            - name: 'No apex code scan'
-              uses: actions/github-script@v6
-              if: ${{ hashFiles('changed-sources/force-app/main/default/classes/*.cls') == '' }}
-              with:
-                  script: |
-                    github.rest.issues.createComment({
-                    issue_number: context.issue.number,
-                    owner: context.repo.owner,
-                    repo: context.repo.repo,
-                    body: 'No Apex class changes identified - PMD not run'
-                    })
-                    
-            # Performs a check only deployment to validate the components can be deployed to the destination org      
-            - name: 'Check-only deploy'
-              id : checkDeploy
+            # Authenticate to org
+            - name: 'Authenticate to deployment org'
+              run: sfdx auth:sfdxurl:store -f ./SFDX_AUTH_URL.txt -s -a deployment
+              
+            # Performs a create/update deployment to the destination org 
+            - name: 'Deploy the changes in branch to deployment destination'
               run: |
                 if [ -d "changed-sources/force-app" ] && [ -n "$(ls -A changed-sources/force-app)" ]; then
-                  sfdx force:source:deploy -p "changed-sources/force-app" --checkonly --testlevel RunLocalTests  --json
+                    sfdx force:source:deploy -p "changed-sources/force-app"  --testlevel RunLocalTests --json
                 else
                     echo "No changes in the 'changed-sources' directory. Skipping deployment."
-                fi                  
-
-            # Writes a comment to the pull request if the check only delta deployment failed
-            - name: 'Test deployment failed'
-              uses: actions/github-script@v6
-              if: failure() && steps.checkDeploy.outcome == 'failure'
-              with:
-                  script: |
-                    github.rest.issues.createComment({
-                    issue_number: context.issue.number,
-                    owner: context.repo.owner,
-                    repo: context.repo.repo,
-                    body: 'Salesforce deployment failed - check workflow logs'
-                    })
-                    
-            # Performs a check only destructivedeployment to validate the components can be deleted from the destination org 
-            - name: 'Check-only deploy for destructive changes'
-              id: checkDestructiveDeploy
+                fi   
+              
+            # Performs a destructive deployment to the destination org
+            - name: 'Deploy destructive changes (if any) to deployment destination'
               run: |
-                # Trigger the check-only deployment
-                result=$(sfdx force:mdapi:deploy -d "changed-sources/destructiveChanges" --checkonly --json)
+                # Trigger the deployment
+                result=$(sfdx force:mdapi:deploy -d "changed-sources/destructiveChanges" --json)
                 
                 # Extract deployment ID
                 deployId=$(echo $result | jq -r '.result.id')
@@ -236,17 +175,3 @@ jobs:
                     echo "Destructive changes deployment failed."
                     exit 1
                 fi
-
-
-            # Writes a comment to the pull request if the check only destructive deployment failed
-            - name: 'Test destructive deployment failed'
-              uses: actions/github-script@v6
-              if: failure() && steps.CheckDestructiveDeploy.outcome == 'failure'
-              with:
-                  script: |
-                    github.rest.issues.createComment({
-                    issue_number: context.issue.number,
-                    owner: context.repo.owner,
-                    repo: context.repo.repo,
-                    body: 'Salesforce destructive deployment failed - check workflow logs'
-                    })
