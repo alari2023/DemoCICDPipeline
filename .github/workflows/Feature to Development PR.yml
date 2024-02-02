@@ -21,6 +21,10 @@ jobs:
     validate-deployment:
         runs-on: ubuntu-latest
         if: ${{ github.actor != 'dependabot[bot]' }}
+        permissions:
+        contents: read    # Specify read permission for accessing repository contents
+        pull-requests: write # Specify write permission for pull requests
+        
         
         env:
           SFDX_DEPLOYMENT_TYPE: ''  
@@ -33,8 +37,9 @@ jobs:
             - name: 'Checkout source code'
               uses: actions/checkout@v3
               with:
-                token: ${{ secrets.ACCESS_TOKEN }}
                 fetch-depth: 0
+                token: ${{ secrets.GITHUB_TOKEN }} # Use the GITHUB_TOKEN 
+
             
             # Install Salesforce CLI
             - name: 'Install Salesforce CLI'
