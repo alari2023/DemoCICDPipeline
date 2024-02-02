@@ -125,7 +125,7 @@ jobs:
             # Uploads a package.xml file of all the components that SFDX git delta has identified as created or modified 
             - name: 'Upload change sources file'
               if: success() || failure()
-              uses: actions/upload-artifact@v3   
+              uses: actions/upload-artifact@v4   
               with:
                 name: Changed-Updated-Components
                 path: changed-sources/package/package.xml
@@ -134,7 +134,7 @@ jobs:
             # Uploads a package.xml file of all the components that SFDX git delta has identified as deleted
             - name: 'Upload destructive source file'
               if: success() || failure()
-              uses: actions/upload-artifact@v3   
+              uses: actions/upload-artifact@v4 
               with:
                 name: Deleted-Components
                 path: changed-sources/destructiveChanges/destructiveChanges.xml
