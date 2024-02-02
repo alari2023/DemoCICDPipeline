@@ -21,9 +21,7 @@ jobs:
     validate-deployment:
         runs-on: ubuntu-latest
         if: ${{ github.actor != 'dependabot[bot]' }}
-        permissions:
-        contents: read    # Specify read permission for accessing repository contents
-        pull-requests: write # Specify write permission for pull requests
+
         
         
         env:
@@ -39,6 +37,7 @@ jobs:
               with:
                 fetch-depth: 0
                 token: ${{ secrets.GITHUB_TOKEN }} # Use the GITHUB_TOKEN 
+                ref: ${{ github.ref }}
 
             
             # Install Salesforce CLI
