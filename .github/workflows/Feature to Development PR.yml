@@ -132,7 +132,7 @@ jobs:
             # Uploads a package.xml file of all the components that SFDX git delta has identified as created or modified 
             - name: 'Upload change sources file'
               if: success() || failure()
-              uses: actions/upload-artifact@v3   
+              uses: actions/upload-artifact@v4  
               with:
                 name: Changed-Updated-Components
                 path: changed-sources/package/package.xml
@@ -141,7 +141,7 @@ jobs:
             # Uploads a package.xml file of all the components that SFDX git delta has identified as deleted
             - name: 'Upload destructive source file'
               if: success() || failure()
-              uses: actions/upload-artifact@v3   
+              uses: actions/upload-artifact@v4   
               with:
                 name: Deleted-Components
                 path: changed-sources/destructiveChanges/destructiveChanges.xml
@@ -149,7 +149,7 @@ jobs:
                 
             # Set up the PMD tool
             - name: 'Setup PMD'
-              uses: legetz/setup-pmd@7.0.0-rc3
+              uses: legetz/setup-pmd@7.0.0-rc4
             
             # Run the PMD code scan if there has been apex class changes           
             - name: 'Apex changes scan'
@@ -161,7 +161,7 @@ jobs:
             # Uploads the PMD file if the PMD scan fails
             - name: 'Upload PMD file'
               if:  failure()
-              uses: actions/upload-artifact@v3
+              uses: actions/upload-artifact@v4
               with:
                 name: Pmd-Scan-Report
                 path: ./pmdResults/PmdResults.sarif
@@ -169,7 +169,7 @@ jobs:
             
             # Writes a comment to the pull request if the PMD scan failed    
             - name: 'Apex code scan failed'
-              uses: actions/github-script@v6
+              uses: actions/github-script@v7
               if: failure() && steps.Codescan.outcome == 'failure'
               with:
                   script: |
@@ -181,7 +181,7 @@ jobs:
                     })
             # Writes a comment to the pull request to inform that there was no Apex code scan run
             - name: 'No apex code scan'
-              uses: actions/github-script@v6
+              uses: actions/github-script@v7
               if: ${{ hashFiles('changed-sources/force-app/main/default/classes/*.cls') == '' }}
               with:
                   script: |
@@ -204,7 +204,7 @@ jobs:
 
             # Writes a comment to the pull request if the check only delta deployment failed
             - name: 'Test deployment failed'
-              uses: actions/github-script@v6
+              uses: actions/github-script@v7
               if: failure() && steps.checkDeploy.outcome == 'failure'
               with:
                   script: |
@@ -244,7 +244,7 @@ jobs:
 
             # Writes a comment to the pull request if the check only destructive deployment failed
             - name: 'Test destructive deployment failed'
-              uses: actions/github-script@v6
+              uses: actions/github-script@v7
               if: failure() && steps.CheckDestructiveDeploy.outcome == 'failure'
               with:
                   script: |
