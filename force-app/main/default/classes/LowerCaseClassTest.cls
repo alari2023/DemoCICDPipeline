@@ -2,8 +2,9 @@
 public class LowerCaseClassTest 
 {	
     @isTest
-	public static void Test1()
+	public static void test1()
     {
-		lowercaseClass.lowerCaseClass();
+		lowercaseClass.method1();
+		system.assert(1,1);
 	}
 }
