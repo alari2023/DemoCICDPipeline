@@ -12,17 +12,17 @@
             <value>
                 <fullName>Gold</fullName>
                 <default>false</default>
-                <label>Gold</label>
+                <label>Gold1</label>
             </value>
             <value>
                 <fullName>Silver</fullName>
                 <default>false</default>
-                <label>Silver</label>
+                <label>Silver2</label>
             </value>
             <value>
                 <fullName>Platinum</fullName>
                 <default>false</default>
-                <label>Platinum</label>
+                <label>Platinum3</label>
             </value>
             <value>
                 <fullName>Bronze</fullName>
