@@ -65,7 +65,7 @@ jobs:
             # Store label information in an environment variable
             - name: 'Supress destructive change errors'
               run: | 
-                    echo "SUPRESS_DESTRUCTIVE=${{ vars.SUPRESS_DESTRUCTIVE }}"
+                    echo "SUPRESS_DESTRUCT=${{ vars.SUPRESS_DESTRUCTIVE }}"
                 
             # Populate auth file with SFDX_URL secret of deployment destination.
             - name: 'Populate auth file with SFDX_URL secret of Test deployment destination'
@@ -226,7 +226,8 @@ jobs:
             # Performs a check only destructivedeployment to validate the components can be deleted from the destination org 
             - name: 'Check-only deploy for destructive changes'
               id: checkDestructiveDeploy
-              if: ${{ env.SUPRESS_DESTRUCTIVE == 'FALSE' }}
+              if: ${{ env.SUPRESS_DESTRUCT == 'FALSE' }}
+              
               run: |
                 # Trigger the check-only deployment
                 result=$(sfdx force:mdapi:deploy -d "changed-sources/destructiveChanges" --checkonly --json)
@@ -251,7 +252,7 @@ jobs:
                 fi
                 
             - name: 'Check-only deploy destructive changes'
-              if: ${{ env.SUPRESS_DESTRUCTIVE == 'TRUE' }}
+              if: ${{ env.SUPRESS_DESTRUCT == 'TRUE' }}
               run: |
                   sfdx force:mdapi:deploy -d "changed-sources/destructiveChanges" --checkonly --ignorewarnings --json    
 
@@ -259,7 +260,7 @@ jobs:
             # Writes a comment to the pull request if the check only destructive deployment failed
             - name: 'Test destructive deployment failed'
               uses: actions/github-script@v7
-              if: failure() && steps.CheckDestructiveDeploy.outcome == 'failure' && ${{ env.SUPRESS_DESTRUCTIVE == 'FALSE' }}
+              if: failure() && steps.CheckDestructiveDeploy.outcome == 'failure' && ${{ env.SUPRESS_DESTRUCT == 'FALSE' }}
               with:
                   script: |
                     github.rest.issues.createComment({
