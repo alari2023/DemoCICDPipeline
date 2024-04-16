@@ -32,6 +32,10 @@ jobs:
               run: | 
                   echo y | sfdx plugins:install sfdx-git-delta
                   sfdx plugins 
+                  
+            # Store label information in an environment variable
+            - name: 'Supress destructive change errors'
+              run: echo "SUPRESS_DESTRUCTIVE=${{ env.SUPRESS_DESTRUCTIVE }}" >> $GITHUB_ENV
 
             # Checkout the source code
             - name: 'Checkout source code'
@@ -39,7 +43,6 @@ jobs:
               with:
                 fetch-depth: 0
                 token: ${{ secrets.GITHUB_TOKEN }} # Use the GITHUB_TOKEN
-                permissions: read                
 
                 
             # Gets the branch name that the deployment is running on - this drives which org is the destination org     
@@ -155,6 +158,7 @@ jobs:
               
             # Performs a destructive deployment to the destination org
             - name: 'Deploy destructive changes (if any) to deployment destination'
+              if: ${{ env.SUPRESS_DESTRUCTIVE == 'FALSE' }}
               run: |
                 # Trigger the deployment
                 result=$(sfdx force:mdapi:deploy -d "changed-sources/destructiveChanges" --json)
@@ -177,3 +181,9 @@ jobs:
                     echo "Destructive changes deployment failed."
                     exit 1
                 fi
+                
+            # Performs a destructive deployment to the destination org
+            - name: 'Deploy destructive changes'
+              if: ${{ env.SUPRESS_DESTRUCTIVE == 'TRUE' }}
+              run: |
+                  sfdx force:mdapi:deploy -d "changed-sources/destructiveChanges"  --ignorewarnings --json    
