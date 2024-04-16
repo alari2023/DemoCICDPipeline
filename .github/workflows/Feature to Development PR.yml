@@ -64,7 +64,8 @@ jobs:
 
             # Store label information in an environment variable
             - name: 'Supress destructive change errors'
-              run: echo "SUPRESS_DESTRUCTIVE=${{ env.SUPRESS_DESTRUCTIVE }}" >> $GITHUB_ENV
+              run: | 
+                    echo "SUPRESS_DESTRUCTIVE=${{ vars.SUPRESS_DESTRUCTIVE }}"
                 
             # Populate auth file with SFDX_URL secret of deployment destination.
             - name: 'Populate auth file with SFDX_URL secret of Test deployment destination'
