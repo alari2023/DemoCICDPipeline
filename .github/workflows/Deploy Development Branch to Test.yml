@@ -35,7 +35,8 @@ jobs:
                   
             # Store label information in an environment variable
             - name: 'Supress destructive change errors'
-              run: echo "SUPRESS_DESTRUCTIVE=${{ env.SUPRESS_DESTRUCTIVE }}" >> $GITHUB_ENV
+              run: | 
+                    echo "SUPRESS_DESTRUCTIVE=${{ vars.SUPRESS_DESTRUCTIVE }}"
 
             # Checkout the source code
             - name: 'Checkout source code'
