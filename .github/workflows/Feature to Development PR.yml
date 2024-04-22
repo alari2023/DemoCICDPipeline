@@ -262,7 +262,11 @@ jobs:
             - name: 'Check-only deploy destructive changes'
               if: ${{ env.SUPRESS_DESTRUCTIVE == 'TRUE' }}
               run: |
-                  sfdx force:mdapi:deploy -d "changed-sources/destructiveChanges" --checkonly --ignorewarnings --json    
+                  if [ -d "changed-sources/destructiveChanges" ] && [ "$(ls -A changed-sources/destructiveChanges)" ]; then
+                  sfdx force:mdapi:deploy -d "changed-sources/destructiveChanges" --checkonly --ignorewarnings --json
+                  else
+                    echo "DestructiveChanges directory does not exist or is empty. Skipping deployment."
+                  fi                  
 
 
             # Writes a comment to the pull request if the check only destructive deployment failed
