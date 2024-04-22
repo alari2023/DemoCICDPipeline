@@ -78,7 +78,7 @@ jobs:
             # Populate auth file with SFDX_URL secret of BAU Test destination.
             - name: 'Populate auth file with SFDX_URL secret of BAU test deployment destination'
               shell: bash
-              if: ${{ steps.extract_branch.outputs.branch == 'BAUdevelop' }}
+              if: ${{ github.event.pull_request.base.ref == 'BAUdevelop' }}
               run: |
                 echo ${{ secrets.SFDX_AUTH_URL_BAU}} > ./SFDX_AUTH_URL.txt
                 echo "SFDX_DEPLOYMENT_TYPE=${{ vars.SFDX_DEPLOYMENT_TYPE_BAU }}" >> $GITHUB_ENV
