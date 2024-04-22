@@ -7,7 +7,7 @@ on:
     pull_request:
       types: [opened, synchronize]
     
-      branches: [sprint/**, develop, release/** ,master ]
+      branches: [sprint/**, BAUdevelop, develop, release/**, master]
     
       paths:
         - 'force-app/**'
@@ -74,6 +74,14 @@ jobs:
               run: |
                   echo ${{ secrets.SFDX_AUTH_URL_TEST}} > ./SFDX_AUTH_URL.txt
                   echo "SFDX_DEPLOYMENT_TYPE=${{ vars.SFDX_DEPLOYMENT_TYPE_TEST }}" >> $GITHUB_ENV
+
+            # Populate auth file with SFDX_URL secret of BAU Test destination.
+            - name: 'Populate auth file with SFDX_URL secret of BAU test deployment destination'
+              shell: bash
+              if: ${{ steps.extract_branch.outputs.branch == 'BAUdevelop' }}
+              run: |
+                echo ${{ secrets.SFDX_AUTH_URL_BAU}} > ./SFDX_AUTH_URL.txt
+                echo "SFDX_DEPLOYMENT_TYPE=${{ vars.SFDX_DEPLOYMENT_TYPE_BAU }}" >> $GITHUB_ENV
 
             # Populate auth file with SFDX_URL secret of deployment destination.
             - name: 'Populate auth file with SFDX_URL secret of ST deployment destination'
@@ -250,7 +258,7 @@ jobs:
                     echo "Destructive changes deployment failed."
                     exit 1
                 fi
-                
+            # Ignore validation errors
             - name: 'Check-only deploy destructive changes'
               if: ${{ env.SUPRESS_DESTRUCTIVE == 'TRUE' }}
               run: |
