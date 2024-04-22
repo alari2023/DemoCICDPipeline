@@ -2,7 +2,7 @@
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>SLA__c</fullName>
     <externalId>false</externalId>
-    <label>I have updated this label</label>
+    <label>SLA</label>
     <required>false</required>
     <trackFeedHistory>false</trackFeedHistory>
     <type>Picklist</type>
